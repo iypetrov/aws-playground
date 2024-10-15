@@ -1,5 +1,5 @@
-resource "aws_s3_bucket" "gopizza_bucket" {
-  bucket        = "gopizza-bucket-202410150937"
+resource "aws_s3_bucket" "bucket" {
+  bucket        = "${var.app}-bucket-202410150937"
   force_destroy = true
   tags = {
     "Application" = var.app
@@ -9,8 +9,8 @@ resource "aws_s3_bucket" "gopizza_bucket" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "gopizza_bucket_access_block" {
-  bucket                  = aws_s3_bucket.gopizza_bucket.id
+resource "aws_s3_bucket_public_access_block" "bucket_access_block" {
+  bucket                  = aws_s3_bucket.bucket.id
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false

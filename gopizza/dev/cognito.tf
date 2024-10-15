@@ -1,5 +1,5 @@
-resource "aws_cognito_user_pool" "gopizza_user_pool" {
-  name                     = "gopizza-user-pool"
+resource "aws_cognito_user_pool" "user_pool" {
+  name                     = "${var.app}-user-pool"
   auto_verified_attributes = ["email"]
   username_attributes      = ["email"]
   schema {
@@ -19,9 +19,9 @@ resource "aws_cognito_user_pool" "gopizza_user_pool" {
   }
 }
 
-resource "aws_cognito_user_pool_client" "gopizza_user_pool_client" {
-  name                          = "gopizza-user-pool-client"
-  user_pool_id                  = aws_cognito_user_pool.gopizza_user_pool.id
+resource "aws_cognito_user_pool_client" "user_pool_client" {
+  name                          = "${var.app}-user-pool-client"
+  user_pool_id                  = aws_cognito_user_pool.user_pool.id
   supported_identity_providers  = ["COGNITO"]
   explicit_auth_flows           = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
   generate_secret               = false
