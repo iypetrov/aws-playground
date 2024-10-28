@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket        = "${var.app}-bucket-202410150937"
+  bucket        = "${var.app}-bucket-${formatdate("YYYYMMDDHHMM", timestamp())}"
   force_destroy = true
   tags = {
     "Application" = var.app
