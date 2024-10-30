@@ -1,9 +1,15 @@
 #!/bin/bash
 
-#  Dev Set Up
+# common
 apt-get update -y
-apt-get install -y tmux vim quota
+apt-get install -y tmux vim quota firewalld
 
+# docker
+curl -fsSl https://get.docker.com | sh
+sudo groupadd docker
+sudo usermod -aG docker $USER
+
+# tmux config
 cat <<EOF > /home/ubuntu/.tmux.conf
 set-option -g history-limit 25000
 set-option -g prefix C-x
@@ -26,7 +32,9 @@ set-option -g default-terminal "screen-256color"
 bind-key -r r source-file ~/.tmux.conf
 bind-key -r k run-shell "pkill -f tmux"
 EOF
+chown ubuntu:ubuntu /home/ubuntu/.tmux.conf
 
+# vim config
 cat <<EOF > /home/ubuntu/.vimrc
 syntax on
 colo elflord
@@ -65,11 +73,4 @@ nnoremap N Nzzzv
 
 nnoremap <leader>s :%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>
 EOF
-
-chown ubuntu:ubuntu /home/ubuntu/.tmux.conf
 chown ubuntu:ubuntu /home/ubuntu/.vimrc
-
-# Docker
-curl -fsSl https://get.docker.com | sh
-sudo groupadd docker
-sudo usermod -aG docker $USER
