@@ -37,7 +37,6 @@ chown ubuntu:ubuntu /home/ubuntu/.tmux.conf
 # vim config
 cat <<EOF > /home/ubuntu/.vimrc
 syntax on
-colo elflord
 
 set number relativenumber
 set tabstop=4
@@ -56,8 +55,6 @@ set incsearch
 set scrolloff=8
 
 set updatetime=50
-
-set colorcolumn=80
 
 let mapleader = " "
 
