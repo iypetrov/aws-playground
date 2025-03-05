@@ -85,18 +85,12 @@ resource "aws_iam_instance_profile" "profile" {
   role = aws_iam_role.role.name
 }
 
-resource "aws_key_pair" "key" {
-  key_name   = "ilia_petrov_key"
-  public_key = file("~/.ssh/id_rsa_personal.pub")
-}
-
 resource "aws_instance" "vm" {
   ami                    = "ami-07c1b39b7b3d2525d"
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.subnet.id
   vpc_security_group_ids = [aws_security_group.backend_security_group.id]
   iam_instance_profile   = aws_iam_instance_profile.profile.name
-  key_name               = aws_key_pair.key.key_name
   user_data              = file("setup.sh")
   tags = {
     Owner = var.owner
