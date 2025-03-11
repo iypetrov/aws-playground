@@ -1,0 +1,6 @@
+#!/bin/bash
+apt-get update -y
+apt-get install -y curl
+echo "${owner}"
+curl -fsSl https://get.docker.com | sh
+gpasswd -a ubuntu docker
