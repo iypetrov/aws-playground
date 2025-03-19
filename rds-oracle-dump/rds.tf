@@ -28,9 +28,44 @@ resource "aws_security_group" "db_sg" {
   ]
 }
 
+resource "aws_iam_role" "rds_role" {
+  name               = "rds-export-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = "sts:AssumeRole",
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "foo-db-subnet-group"
   subnet_ids = [aws_subnet.sb_a.id, aws_subnet.sb_b.id]
+}
+
+resource "aws_iam_policy" "s3_policy" {
+  name   = "rds-s3-access-policy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "s3:*",
+        Resource = "arn:aws:s3:::rds-oracle-backup-2025-03-19-16-00/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "rds_role_policy_attachment" {
+  role       = aws_iam_role.rds_role.name
+  policy_arn = aws_iam_policy.s3_policy.arn
 }
 
 resource "aws_db_instance" "db" {
