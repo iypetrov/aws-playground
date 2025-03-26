@@ -126,13 +126,13 @@ resource "aws_lb_target_group" "alb_tg" {
 resource "aws_lb_target_group_attachment" "alb_tg_attachment_1" {
   target_group_arn = aws_lb_target_group.alb_tg.arn
   target_id        = aws_instance.vm_a.private_ip
-  port             = 8080
+  port             = 80
 }
 
 resource "aws_lb_target_group_attachment" "alb_tg_attachment_2" {
   target_group_arn = aws_lb_target_group.alb_tg.arn
   target_id        = aws_instance.vm_b.private_ip
-  port             = 8080
+  port             = 80
 }
 
 resource "aws_lb_listener" "alb_listener" {

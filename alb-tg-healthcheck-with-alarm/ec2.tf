@@ -67,8 +67,10 @@ resource "aws_instance" "vm_a" {
   user_data                   = <<-EOF
     #!/bin/bash
     apt-get update
-    apt install -y git
-    echo "Hello, World!"
+    apt install -y git python3 python3-pip python3.12-venv
+    ln -sf python3 /usr/bin/python
+    python -m venv ci
+    . ci/bin/activate
     git clone https://github.com/iypetrov/debug-display-req-headers.git
     cd debug-display-req-headers
     pip3 install -r requirements.txt
@@ -94,8 +96,10 @@ resource "aws_instance" "vm_b" {
   user_data                   = <<-EOF
     #!/bin/bash
     apt-get update
-    apt install -y git
-    echo "Hello, World!"
+    apt install -y git python3 python3-pip python3.12-venv
+    ln -sf python3 /usr/bin/python
+    python -m venv ci
+    . ci/bin/activate
     git clone https://github.com/iypetrov/debug-display-req-headers.git
     cd debug-display-req-headers
     pip3 install -r requirements.txt
