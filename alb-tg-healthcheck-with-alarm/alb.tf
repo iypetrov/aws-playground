@@ -115,7 +115,7 @@ resource "aws_lb_target_group" "alb_tg" {
     healthy_threshold   = "3"
     interval            = "30"
     matcher             = "200-399"
-    path                = "/500"
+    path                = "/200"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = "5"

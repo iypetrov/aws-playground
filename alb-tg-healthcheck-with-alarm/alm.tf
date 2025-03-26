@@ -11,12 +11,18 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_instances_alarm" {
   alarm_actions       = [aws_sns_topic.alb_notifications.arn]
   alarm_description   = "Alarm when the number of unhealthy instances is greater than or equal to 1"
   dimensions = {
-    LoadBalancer = aws_lb.alb.name
-    TargetGroup  = aws_lb_target_group.alb_tg.name
+    LoadBalancer = aws_lb.alb.arn_suffix
+    TargetGroup  = aws_lb_target_group.alb_tg.arn_suffix
   }
   insufficient_data_actions = []
 }
 
 resource "aws_sns_topic" "alb_notifications" {
   name = "alb-notifications"
+}
+
+resource "aws_sns_topic_subscription" "email_sub" {
+  topic_arn = aws_sns_topic.alb_notifications.arn
+  protocol  = "email"
+  endpoint  = "ilia.yavorov.petrov@gmail.com"
 }
