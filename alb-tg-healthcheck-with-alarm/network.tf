@@ -13,6 +13,19 @@ resource "aws_subnet" "public_subnet_a" {
   map_public_ip_on_launch = true
 }
 
+resource "aws_route_table" "rt_a" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+}
+
+resource "aws_route_table_association" "rt_association_a" {
+  subnet_id      = aws_subnet.public_subnet_a.id
+  route_table_id = aws_route_table.rt_a.id
+}
+
 resource "aws_subnet" "public_subnet_b" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.public_subnet_b_cidr
@@ -20,43 +33,15 @@ resource "aws_subnet" "public_subnet_b" {
   map_public_ip_on_launch = true
 }
 
-resource "aws_security_group" "sg" {
+resource "aws_route_table" "rt_b" {
   vpc_id = aws_vpc.vpc.id
-  ingress = [
-    {
-      cidr_blocks      = [var.public_subnet_a_cidr, var.public_subnet_b_cidr]
-      description      = "http"
-      from_port        = 80
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = "tcp"
-      security_groups  = []
-      self             = false
-      to_port          = 80
-    },
-    {
-      cidr_blocks      = [var.public_subnet_a_cidr, var.public_subnet_b_cidr]
-      description      = "https"
-      from_port        = 443
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = "tcp"
-      security_groups  = []
-      self             = false
-      to_port          = 443
-    }
-  ]
-  egress = [
-    {
-      cidr_blocks      = ["0.0.0.0/0"]
-      description      = "everything"
-      from_port        = 0
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = -1
-      security_groups  = []
-      self             = false
-      to_port          = 0
-    }
-  ]
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+}
+
+resource "aws_route_table_association" "rt_association_b" {
+  subnet_id      = aws_subnet.public_subnet_b.id
+  route_table_id = aws_route_table.rt_b.id
 }

@@ -34,35 +34,88 @@ resource "aws_s3_bucket_policy" "alb_logs_policy" {
   })
 }
 
+resource "aws_security_group" "alb_sg" {
+  vpc_id = aws_vpc.vpc.id
+  ingress = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      description      = "http"
+      from_port        = 80
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "tcp"
+      security_groups  = []
+      self             = false
+      to_port          = 80
+    },
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      description      = "https"
+      from_port        = 443
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "tcp"
+      security_groups  = []
+      self             = false
+      to_port          = 443
+    }
+  ]
+  egress = [
+    {
+      cidr_blocks      = ["0.0.0.0/0"]
+      description      = "everything"
+      from_port        = 0
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = -1
+      security_groups  = []
+      self             = false
+      to_port          = 0
+    }
+  ]
+
+  timeouts {
+    delete = "2m"
+  }
+}
+
 resource "aws_lb" "alb" {
   name                             = "alb"
   internal                         = false
-  enable_deletion_protection       = true
   load_balancer_type               = "application"
-  security_groups                  = [aws_security_group.sg.id]
+  security_groups                  = [aws_security_group.alb_sg.id]
   subnets                          = [aws_subnet.public_subnet_a.id, aws_subnet.public_subnet_b.id]
   enable_cross_zone_load_balancing = true
+  enable_deletion_protection       = false
   access_logs {
     bucket  = aws_s3_bucket.alb_logs.bucket
     prefix  = "logs/alb"
     enabled = true
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      aws_security_group.alb_sg,
+      aws_security_group.alb_sg.ingress,
+      aws_security_group.alb_sg.egress
+    ]
+  }
 }
 
 resource "aws_lb_target_group" "alb_tg" {
   name                 = "alb-tg"
+  vpc_id               = aws_vpc.vpc.id
   port                 = "80"
   protocol             = "HTTP"
+  target_type          = "ip"
   ip_address_type      = "ipv4"
-  vpc_id               = aws_vpc.vpc.id
-  target_type          = "instance"
   deregistration_delay = "10"
   health_check {
     enabled             = "true"
     healthy_threshold   = "3"
     interval            = "30"
     matcher             = "200-399"
-    path                = "/health"
+    path                = "/200"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = "6"
@@ -70,8 +123,24 @@ resource "aws_lb_target_group" "alb_tg" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "C00_P_eks_lp_01" {
+resource "aws_lb_target_group_attachment" "alb_tg_attachment_1" {
   target_group_arn = aws_lb_target_group.alb_tg.arn
-  target_id        = aws_autoscaling_group.asg.arn
-  port             = 80
+  target_id        = aws_instance.vm_a.private_ip
+  port             = 8080
+}
+
+resource "aws_lb_target_group_attachment" "alb_tg_attachment_2" {
+  target_group_arn = aws_lb_target_group.alb_tg.arn
+  target_id        = aws_instance.vm_b.private_ip
+  port             = 8080
+}
+
+resource "aws_lb_listener" "alb_listener" {
+  load_balancer_arn = aws_lb.alb.arn
+  protocol = "HTTP"
+  port     = 80
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_tg.arn
+  }
 }
