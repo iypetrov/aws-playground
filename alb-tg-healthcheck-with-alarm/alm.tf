@@ -5,7 +5,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_instances_alarm" {
   metric_name         = "UnHealthyHostCount"
   namespace           = "AWS/ApplicationELB"
   period              = 60
-  statistic           = "Average"
+  statistic           = "Maximum"
   threshold           = 1
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.alb_notifications.arn]
