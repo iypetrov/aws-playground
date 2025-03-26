@@ -12,7 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_instances_alarm" {
   alarm_description   = "Alarm when the number of unhealthy instances is greater than or equal to 1"
   dimensions = {
     LoadBalancer = aws_lb.alb.name
-    TargetGroup         = aws_lb_target_group.alb_tg.name
+    TargetGroup  = aws_lb_target_group.alb_tg.name
   }
   insufficient_data_actions = []
 }

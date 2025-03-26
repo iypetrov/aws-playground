@@ -137,8 +137,8 @@ resource "aws_lb_target_group_attachment" "alb_tg_attachment_2" {
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
-  protocol = "HTTP"
-  port     = 80
+  protocol          = "HTTP"
+  port              = 80
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_tg.arn
