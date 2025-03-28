@@ -8,13 +8,18 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_instances_alarm" {
   statistic           = "Maximum"
   threshold           = 1
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.alb_notifications.arn]
   alarm_description   = "Alarm when the number of unhealthy instances is greater than or equal to 1"
+  insufficient_data_actions = []
+  alarm_actions       = [
+    aws_sns_topic.alb_notifications.arn
+  ]
+  ok_actions = [
+    aws_sns_topic.alb_notifications.arn
+  ]
   dimensions = {
     LoadBalancer = aws_lb.alb.arn_suffix
     TargetGroup  = aws_lb_target_group.alb_tg.arn_suffix
   }
-  insufficient_data_actions = []
 }
 
 resource "aws_sns_topic" "alb_notifications" {
