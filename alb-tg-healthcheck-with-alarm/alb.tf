@@ -103,13 +103,14 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "alb_tg" {
-  name                 = "alb-tg"
-  vpc_id               = aws_vpc.vpc.id
-  port                 = "80"
-  protocol             = "HTTP"
-  target_type          = "ip"
-  ip_address_type      = "ipv4"
-  deregistration_delay = "10"
+  name                          = "alb-tg"
+  vpc_id                        = aws_vpc.vpc.id
+  port                          = "80"
+  protocol                      = "HTTP"
+  target_type                   = "ip"
+  ip_address_type               = "ipv4"
+  deregistration_delay          = "10"
+  load_balancing_algorithm_type = "round_robin"
   health_check {
     enabled             = "true"
     healthy_threshold   = "3"
