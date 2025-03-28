@@ -145,3 +145,17 @@ resource "aws_lb_listener" "alb_listener" {
     target_group_arn = aws_lb_target_group.alb_tg.arn
   }
 }
+
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+  priority     = 1
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_tg.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+}
