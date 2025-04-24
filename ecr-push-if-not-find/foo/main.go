@@ -10,7 +10,7 @@ import (
 
 func Handler(ctx context.Context, event interface{}) (interface{}, error) {
 	log := logger.Get(ctx)
-	log.Info("%v", event)
+	log.Info("Event: %v", event)
 	return event, nil
 }
 
