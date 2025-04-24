@@ -1,0 +1,46 @@
+---
+name: Build and push image playground/foo lambda image to ECR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ecr-push-if-not-find/foo/**'
+
+jobs:
+  build-and-push-image-to-ecr:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Lambda function name and tag
+        run: |
+          echo "NAME=foo" >> $GITHUB_ENV
+          echo "TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+          echo "Using Lambda name: foo"
+          echo "Using commit hash tag: $(echo $GITHUB_SHA | cut -c1-7)"
+
+      - name: Build image
+        run: |
+          cd ecr-push-if-not-find/${{ env.NAME }}
+          docker build -t playground/${{ env.NAME }}:${{ env.TAG }} .
+
+      - name: Login to ECR
+        uses: jwalton/gh-ecr-login@v3
+        with:
+          region: ${{ secrets.AWS_REGION }}
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Tag and Push to ECR
+        run: |
+          set -e
+          IMAGE_NAME=678468774710.dkr.ecr.eu-west-2.amazonaws.com/playground/${{ env.NAME }}:${{ env.TAG }}
+          docker tag playground/${{ env.NAME }}:${{ env.TAG }} $IMAGE_NAME
+          docker push $IMAGE_NAME
