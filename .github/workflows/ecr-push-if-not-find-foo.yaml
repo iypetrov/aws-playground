@@ -34,13 +34,13 @@ jobs:
       - name: Login to ECR
         uses: jwalton/gh-ecr-login@v3
         with:
-          region: ${{ secrets.AWS_REGION }}
           access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ${{ secrets.AWS_REGION }}
 
       - name: Tag and Push to ECR
         run: |
           set -e
-          IMAGE_NAME=678468774710.dkr.ecr.eu-west-2.amazonaws.com/playground/${{ env.NAME }}:${{ env.TAG }}
+          IMAGE_NAME=678468774710.dkr.ecr.${{ secret.AWS_REGION }}.amazonaws.com/playground/${{ env.NAME }}:${{ env.TAG }}
           docker tag playground/${{ env.NAME }}:${{ env.TAG }} $IMAGE_NAME
           docker push $IMAGE_NAME
