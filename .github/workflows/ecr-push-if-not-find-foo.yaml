@@ -39,8 +39,10 @@ jobs:
           region: ${{ secrets.AWS_REGION }}
 
       - name: Tag and Push to ECR
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           set -e
-          IMAGE_NAME=678468774710.dkr.ecr.${{ secret.AWS_REGION }}.amazonaws.com/playground/${{ env.NAME }}:${{ env.TAG }}
+          IMAGE_NAME=678468774710.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/playground/${{ env.NAME }}:${{ env.TAG }}
           docker tag playground/${{ env.NAME }}:${{ env.TAG }} $IMAGE_NAME
           docker push $IMAGE_NAME
