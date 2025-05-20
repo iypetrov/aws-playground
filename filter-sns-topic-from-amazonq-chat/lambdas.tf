@@ -23,10 +23,6 @@ resource "aws_lambda_function" "filter_sns_topic_from_amazonq_chat_function" {
   image_uri     = "678468774710.dkr.ecr.eu-west-2.amazonaws.com/filter-sns-topic-from-amazonq-chat:1.1.0"
   package_type  = "Image"
   role          = aws_iam_role.filter_sns_topic_from_amazonq_chat_function_role.arn
-  vpc_config {
-    subnet_ids         = [aws_subnet.public_subnet_a.id, aws_subnet.public_subnet_b.id]
-    security_group_ids = [aws_security_group.vm_sg.id]
-  }
   environment {
     variables = {
       APP_ENV = "prod"
