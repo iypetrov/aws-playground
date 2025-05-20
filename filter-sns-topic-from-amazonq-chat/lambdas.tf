@@ -29,7 +29,7 @@ resource "aws_lambda_function" "filter_sns_topic_from_amazonq_chat_function" {
   }
   environment {
     variables = {
-      APP_ENV = "prod"
+      APP_ENV = "local"
     }
   }
 }
