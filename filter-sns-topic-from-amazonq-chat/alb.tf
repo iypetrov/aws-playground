@@ -105,7 +105,7 @@ resource "aws_lb" "alb" {
 resource "aws_lb_target_group" "alb_tg" {
   name                          = "alb-tg"
   vpc_id                        = aws_vpc.vpc.id
-  port                          = "80"
+  port                          = "8080"
   protocol                      = "HTTP"
   target_type                   = "ip"
   ip_address_type               = "ipv4"
@@ -127,7 +127,7 @@ resource "aws_lb_target_group" "alb_tg" {
 resource "aws_lb_target_group_attachment" "alb_tg_attachment" {
   target_group_arn = aws_lb_target_group.alb_tg.arn
   target_id        = aws_instance.vm.private_ip
-  port             = 80
+  port             = 8080
 }
 
 resource "aws_lb_listener" "alb_listener" {
