@@ -17,3 +17,15 @@ variable "public_subnet_b_cidr" {
   type    = string
   default = "10.0.2.0/24"
 }
+
+variable "team_id" {
+  type    = string
+}
+
+variable "teams_channel_id" {
+  type    = string
+}
+
+variable "teams_tenant_id" {
+  type    = string
+}
