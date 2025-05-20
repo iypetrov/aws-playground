@@ -20,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "filter_sns_topic_from_amazonq_chat_fu
 resource "aws_lambda_function" "filter_sns_topic_from_amazonq_chat_function" {
   function_name = "filter-sns-topic-from-amazonq-chat"
   timeout       = 900
-  image_uri     = "678468774710.dkr.ecr.eu-west-2.amazonaws.com/filter-sns-topic-from-amazonq-chat:1.1.0"
+  image_uri     = "678468774710.dkr.ecr.eu-west-2.amazonaws.com/filter-sns-topic-from-amazonq-chat:1.2.0"
   package_type  = "Image"
   role          = aws_iam_role.filter_sns_topic_from_amazonq_chat_function_role.arn
   environment {
