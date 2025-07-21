@@ -13,6 +13,13 @@ output "s3_bucket_name" {
   value = aws_s3_bucket.website_bucket.bucket
 }
 
+resource "aws_s3_bucket_versioning" "pg_backups_versioning" {
+  bucket = aws_s3_bucket.website_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "website_bucket" {
   bucket                  = aws_s3_bucket.website_bucket.id
   block_public_acls       = false
