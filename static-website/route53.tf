@@ -34,7 +34,7 @@ resource "aws_acm_certificate_validation" "cloudfront" {
 }
 
 resource "aws_route53_record" "cloudfront" {
-  name    = var.domain_name
+  name    = "status"
   type    = "A"
   zone_id = aws_route53_zone.main.zone_id
 
