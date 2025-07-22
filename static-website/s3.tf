@@ -13,7 +13,7 @@ output "s3_bucket_name" {
   value = aws_s3_bucket.website_bucket.bucket
 }
 
-resource "aws_s3_bucket_versioning" "pg_backups_versioning" {
+resource "aws_s3_bucket_versioning" "website_versioning" {
   bucket = aws_s3_bucket.website_bucket.id
   versioning_configuration {
     status = "Enabled"
