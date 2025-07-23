@@ -10,10 +10,6 @@ resource "aws_s3_bucket_ownership_controls" "website_bucket" {
   }
 }
 
-output "s3_bucket_name" {
-  value = aws_s3_bucket.website_bucket.bucket
-}
-
 resource "aws_s3_bucket_versioning" "website_versioning" {
   bucket = aws_s3_bucket.website_bucket.id
   versioning_configuration {
@@ -24,9 +20,9 @@ resource "aws_s3_bucket_versioning" "website_versioning" {
 resource "aws_s3_bucket_public_access_block" "website_bucket" {
   bucket                  = aws_s3_bucket.website_bucket.id
   block_public_acls       = true
-  block_public_policy     = true 
-  ignore_public_acls      = true 
-  restrict_public_buckets = true 
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_policy" "website_bucket_policy" {
@@ -101,20 +97,12 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   }
 }
 
-output "cloudfront_distribution_domain_name" {
-  value = aws_cloudfront_distribution.website_distribution.domain_name
-}
-
-output "cloudfront_distribution_id" {
-  value = aws_cloudfront_distribution.website_distribution.id
-}
-
 resource "aws_route53_zone" "main" {
   name = var.domain_name
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  provider = aws.us_east_1
+  provider          = aws.us_east_1
   domain_name       = "status.${var.domain_name}"
   validation_method = "DNS"
 
@@ -142,7 +130,7 @@ resource "aws_route53_record" "cloudfront_validation" {
 }
 
 resource "aws_acm_certificate_validation" "cloudfront" {
-  provider = aws.us_east_1
+  provider                = aws.us_east_1
   certificate_arn         = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [for record in aws_route53_record.cloudfront_validation : record.fqdn]
 }
