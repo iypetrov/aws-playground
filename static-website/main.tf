@@ -47,6 +47,49 @@ resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
   comment = "OAI for S3 bucket"
 }
 
+resource "aws_cloudfront_function" "trailing_slash" {
+  name    = "remove-trailing-slash-fn"
+  runtime = "cloudfront-js-2.0"
+  comment = "Remove trailing slash from URIs (unless root)"
+
+  code = <<EOF
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+
+  if (uri === "/") {
+    return request;
+  }
+
+  if (uri.endsWith("/")) {
+    return {
+      statusCode: 301,
+      statusDescription: "Moved Permanently",
+      headers: {
+        location: {
+          value: uri + 'index.html'
+        }
+      }
+    };
+  } else if (!uri.includes('.')) {
+    return {
+      statusCode: 301,
+      statusDescription: "Moved Permanently",
+      headers: {
+        location: {
+          value: uri + '/index.html'
+        }
+      }
+    };
+  }
+
+  return request;
+}
+EOF
+
+  publish = true
+}
+
 resource "aws_cloudfront_distribution" "website_distribution" {
   depends_on = [
     aws_acm_certificate_validation.cloudfront
@@ -77,6 +120,11 @@ resource "aws_cloudfront_distribution" "website_distribution" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.trailing_slash.arn
     }
 
     viewer_protocol_policy = "redirect-to-https"
