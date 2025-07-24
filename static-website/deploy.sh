@@ -9,6 +9,6 @@ CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME="$(terraform output -raw cloudfront_distribu
 hugo --config config.yml
 aws s3 sync public/ "s3://${BUCKET_NAME}/" --delete
 aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*"
-echo "https://${CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME}"
+echo "https://${CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME} or https://status.ip812.click"
 rm -rf public/
 rm .hugo_build.lock

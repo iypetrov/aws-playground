@@ -9,3 +9,8 @@ variable "domain_name" {
   type    = string
   default = "ip812.click"
 }
+
+variable "zone_id" {
+  type    = string
+  default = "Z0701329ZBXDJ0CZIFW4"
+}

@@ -146,10 +146,6 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   }
 }
 
-resource "aws_route53_zone" "main" {
-  name = var.domain_name
-}
-
 resource "aws_acm_certificate" "cloudfront" {
   provider          = aws.us_east_1
   domain_name       = "status.${var.domain_name}"
@@ -175,7 +171,7 @@ resource "aws_route53_record" "cloudfront_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = aws_route53_zone.main.zone_id
+  zone_id         = var.zone_id
 }
 
 resource "aws_acm_certificate_validation" "cloudfront" {
@@ -187,7 +183,7 @@ resource "aws_acm_certificate_validation" "cloudfront" {
 resource "aws_route53_record" "cloudfront" {
   name    = "status"
   type    = "A"
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = var.zone_id
 
   alias {
     name                   = aws_cloudfront_distribution.website_distribution.domain_name
