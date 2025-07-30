@@ -16,15 +16,16 @@ module "vpc" {
     "${var.aws_region}b"
   ]
   public_subnets = [
-    cidrsubnet(local.vpc_cidr, 8, 0)
+    cidrsubnet(local.vpc_cidr, 8, 0),
+    cidrsubnet(local.vpc_cidr, 8, 1),
   ]
   private_subnets = [
-    cidrsubnet(local.vpc_cidr, 8, 1),
-    cidrsubnet(local.vpc_cidr, 8, 2)
+    cidrsubnet(local.vpc_cidr, 8, 2),
+    cidrsubnet(local.vpc_cidr, 8, 3)
   ]
   intra_subnets = [
-    cidrsubnet(local.vpc_cidr, 8, 3),
-    cidrsubnet(local.vpc_cidr, 8, 4)
+    cidrsubnet(local.vpc_cidr, 8, 4),
+    cidrsubnet(local.vpc_cidr, 8, 5)
   ]
 
   enable_nat_gateway = true
@@ -101,30 +102,5 @@ module "eks" {
         "karpenter.sh/controller" = "true"
       }
     }
-  }
-
-  node_security_group_additional_rules = {
-    allow_ssh = {
-      description = "Allow SSH"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      type        = "ingress"
-      cidr_blocks = ["10.0.0.0/16"]
-    }
-
-    allow_all_egress = {
-      description = "Allow all outbound"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      type        = "egress"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-
-
-  node_security_group_tags = {
-    "karpenter.sh/discovery" = local.eks_config.cluster_name
   }
 }
