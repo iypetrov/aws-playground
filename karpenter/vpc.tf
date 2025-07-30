@@ -7,13 +7,13 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_subnet" "private_subnet_a" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.private_subnet_a_cidr
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 1)
   availability_zone = "${var.aws_region}a"
 }
 
 resource "aws_subnet" "private_subnet_b" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.private_subnet_b_cidr
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, 2)
   availability_zone = "${var.aws_region}b"
 }
 
