@@ -19,4 +19,4 @@
 .terraform.tfstate.lock.info
 terraform.tfstate
 terraform.tfstate.backup
-karpenter/terraform.tfvars
+eks-karpenter/terraform.tfvars
