@@ -118,14 +118,87 @@ module "eks" {
   }
 }
 
-provider "kubernetes" {
-  host                   = module.eks.eks_cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.eks_cluster_certificate_authority_data)
+module "karpenter" {
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "~> 20.0"
 
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", module.eks.eks_cluster_id]
+  cluster_name = module.eks.cluster_name
+
+  enable_v1_permissions = true
+
+  enable_irsa = true
+  irsa_oidc_provider_arn = module.eks.oidc_provider_arn
+
+  enable_pod_identity = true
+  create_pod_identity_association = true
+
+  # Attach additional IAM policies to the Karpenter node IAM role
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
 }
+
+resource "helm_release" "karpenter" {
+  namespace           = "kube-system"
+  name                = "karpenter"
+  repository          = "oci://public.ecr.aws/karpenter"
+  chart               = "karpenter"
+  version             = "1.0.6"
+  wait                = false
+
+  values = [
+    <<-EOT
+    serviceAccount:
+      name: ${module.karpenter.service_account}
+    settings:
+      clusterName: ${module.eks.cluster_name}
+      clusterEndpoint: ${module.eks.cluster_endpoint}
+      interruptionQueue: ${module.karpenter.queue_name}
+    EOT
+  ]
+}
+
+resource "kubectl_manifest" "karpenter_provisioner" {
+  yaml_body = <<-YAML
+---
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: default
+spec:
+  ttlSecondsAfterEmpty: 60 # scale down nodes after 60 seconds without workloads (excluding daemons)
+  ttlSecondsUntilExpired: 604800 # expire nodes after 7 days (in seconds) = 7 * 60 * 60 * 24
+  limits:
+    resources:
+      cpu: 100 # limit to 100 CPU cores
+  requirements:
+    # Include general purpose instance families
+    - key: karpenter.k8s.aws/instance-family
+      operator: In
+      values: [t3, c5, m5, r5]
+    # Exclude small instance sizes
+    - key: karpenter.k8s.aws/instance-size
+      operator: NotIn
+      values: [nano, micro, small]
+  providerRef:
+    name: default
+YAML
+}
+
+# resource "kubectl_manifest" "karpenter_template" {
+#   yaml_body = <<-YAML
+# ---
+# apiVersion: karpenter.k8s.aws/v1alpha1
+# kind: AWSNodeTemplate
+# metadata:
+#     name: default
+# spec:
+#   subnetSelector:
+#     "kubernetes.io/cluster/${module.eks.cluster_name}": "owned"
+#   securityGroupSelector:
+#     "kubernetes.io/cluster/${module.eks.cluster_name}": "owned"
+#   instanceProfile: ${module.karpenter.instance_profile_name}
+#   tags:
+#     "kubernetes.io/cluster/${module.eks.cluster_name}": "owned"
+# YAML
+# }
