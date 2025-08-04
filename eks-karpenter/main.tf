@@ -159,6 +159,10 @@ resource "helm_release" "karpenter" {
 }
 
 resource "kubectl_manifest" "karpenter_ec2nodeclass_workloads" {
+  depends_on = [
+    helm_release.karpenter
+  ]
+
   yaml_body = <<-EOF
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
@@ -188,6 +192,10 @@ EOF
 }
 
 resource "kubectl_manifest" "karpenter_nodepool_workloads" {
+  depends_on = [
+    helm_release.karpenter
+  ]
+
   yaml_body = <<-EOF
 apiVersion: karpenter.sh/v1
 kind: NodePool
