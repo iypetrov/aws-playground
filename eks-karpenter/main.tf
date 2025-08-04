@@ -45,7 +45,7 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb"         = 1
     "kubernetes.io/cluster/${local.eks_name}" = "owned"
-    "karpenter.sh/discovery" = "${local.eks_name}"
+    "karpenter.sh/discovery"                  = "${local.eks_name}"
   }
 
   tags = {
@@ -73,9 +73,9 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     aws-ebs-csi-driver     = {}
-    vpc-cni                = {
+    vpc-cni = {
       configuration_values = jsonencode({
-        enableWindowsIpam   = "true"
+        enableWindowsIpam = "true"
       })
     }
   }
@@ -119,17 +119,17 @@ module "eks" {
 }
 
 module "karpenter" {
-  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
   version = "~> 20.0"
 
   cluster_name = module.eks.cluster_name
 
   enable_v1_permissions = true
 
-  enable_irsa = true
+  enable_irsa            = true
   irsa_oidc_provider_arn = module.eks.oidc_provider_arn
 
-  enable_pod_identity = true
+  enable_pod_identity             = true
   create_pod_identity_association = true
 
   # Attach additional IAM policies to the Karpenter node IAM role
@@ -139,12 +139,12 @@ module "karpenter" {
 }
 
 resource "helm_release" "karpenter" {
-  namespace           = "kube-system"
-  name                = "karpenter"
-  repository          = "oci://public.ecr.aws/karpenter"
-  chart               = "karpenter"
-  version             = "1.0.6"
-  wait                = false
+  namespace  = "kube-system"
+  name       = "karpenter"
+  repository = "oci://public.ecr.aws/karpenter"
+  chart      = "karpenter"
+  version    = "1.0.6"
+  wait       = false
 
   values = [
     <<-EOT
