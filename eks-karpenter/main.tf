@@ -3,6 +3,30 @@ locals {
   vpc_name    = "vpc-karpenter-v1"
   eks_name    = "karpenter-v1"
   eks_version = "1.33"
+  coredns_version = "v1.11.4-eksbuild.10"
+  kube_proxy_version = "v1.32.3-eksbuild.7"
+  vpc_cni_version = "v1.19.5-eksbuild.1"
+}
+
+resource "aws_eks_addon" "coredns" {
+  cluster_name                = local.eks_name
+  addon_name                  = "coredns"
+  addon_version               = local.coredns_version
+  resolve_conflicts_on_update = "PRESERVE"
+}
+
+resource "aws_eks_addon" "kube_proxy" {
+  cluster_name                = local.eks_name
+  addon_name                  = "kube-proxy"
+  addon_version               = local.kube_proxy_version
+  resolve_conflicts_on_update = "PRESERVE"
+}
+
+resource "aws_eks_addon" "vpc_cni" {
+  cluster_name                = local.eks_name
+  addon_name                  = "vpc-cni"
+  addon_version               = local.vpc_cni_version
+  resolve_conflicts_on_update = "PRESERVE"
 }
 
 module "vpc" {
@@ -67,18 +91,6 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
-
-  cluster_addons = {
-    coredns                = {}
-    eks-pod-identity-agent = {}
-    kube-proxy             = {}
-    aws-ebs-csi-driver     = {}
-    vpc-cni = {
-      configuration_values = jsonencode({
-        enableWindowsIpam = "true"
-      })
-    }
-  }
 
   eks_managed_node_groups = {
     bootstrap = {
