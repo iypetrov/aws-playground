@@ -62,7 +62,7 @@ spec:
           image: traefik:v3.5.0
           resources:
             requests:
-              cpu: "4"
+              cpu: "2"
               memory: 4Gi
           ports:
             - containerPort: 80
