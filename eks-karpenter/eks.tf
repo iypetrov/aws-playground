@@ -9,6 +9,10 @@ locals {
 }
 
 resource "aws_eks_addon" "coredns" {
+  depends_on = [
+    module.eks
+  ]
+
   cluster_name                = local.eks_name
   addon_name                  = "coredns"
   addon_version               = local.coredns_version
@@ -16,6 +20,10 @@ resource "aws_eks_addon" "coredns" {
 }
 
 resource "aws_eks_addon" "kube_proxy" {
+  depends_on = [
+    module.eks
+  ]
+
   cluster_name                = local.eks_name
   addon_name                  = "kube-proxy"
   addon_version               = local.kube_proxy_version
@@ -23,6 +31,10 @@ resource "aws_eks_addon" "kube_proxy" {
 }
 
 resource "aws_eks_addon" "vpc_cni" {
+  depends_on = [
+    module.eks
+  ]
+
   cluster_name                = local.eks_name
   addon_name                  = "vpc-cni"
   addon_version               = local.vpc_cni_version
