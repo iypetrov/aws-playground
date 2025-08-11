@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
+  namespace: proxy
   labels:
     app: nginx
 spec:
@@ -36,6 +37,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: traefik-deployment
+  namespace: proxy
   labels:
     app: traefik
 spec:
