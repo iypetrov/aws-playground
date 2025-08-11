@@ -8,39 +8,6 @@ locals {
   vpc_cni_version = "v1.19.5-eksbuild.1"
 }
 
-resource "aws_eks_addon" "coredns" {
-  depends_on = [
-    module.eks
-  ]
-
-  cluster_name                = local.eks_name
-  addon_name                  = "coredns"
-  addon_version               = local.coredns_version
-  resolve_conflicts_on_update = "PRESERVE"
-}
-
-resource "aws_eks_addon" "kube_proxy" {
-  depends_on = [
-    module.eks
-  ]
-
-  cluster_name                = local.eks_name
-  addon_name                  = "kube-proxy"
-  addon_version               = local.kube_proxy_version
-  resolve_conflicts_on_update = "PRESERVE"
-}
-
-resource "aws_eks_addon" "vpc_cni" {
-  depends_on = [
-    module.eks
-  ]
-
-  cluster_name                = local.eks_name
-  addon_name                  = "vpc-cni"
-  addon_version               = local.vpc_cni_version
-  resolve_conflicts_on_update = "PRESERVE"
-}
-
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 5.0"
@@ -104,8 +71,28 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  cluster_addons = {
+    coredns                = {
+      version = local.coredns_version
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    eks-pod-identity-agent = {
+    }
+    kube-proxy             = {
+      version = local.kube_proxy_version
+      resolve_conflicts_on_update = "OVERWRITE"
+    }
+    vpc-cni = {
+      version = local.vpc_cni_version
+      resolve_conflicts_on_update = "OVERWRITE"
+      configuration_values = jsonencode({
+        enableWindowsIpam = "true"
+      })
+    }
+  }
+
   eks_managed_node_groups = {
-    bootstrap = {
+    system = {
       min_size     = 1
       max_size     = 5
       desired_size = 3
