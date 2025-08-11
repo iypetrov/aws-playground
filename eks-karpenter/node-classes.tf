@@ -1,4 +1,4 @@
-resource "kubectl_manifest" "karpenter_ec2nodeclass_workloads" {
+resource "kubectl_manifest" "karpenter_ec2nodeclass_proxy" {
   depends_on = [
     helm_release.karpenter
   ]
@@ -7,10 +7,10 @@ resource "kubectl_manifest" "karpenter_ec2nodeclass_workloads" {
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
-  name: workloads
+  name: proxy
 spec:
   amiSelectorTerms:
-    - alias: al2023@latest
+    - alias: al2023@v20240807
   role: ${module.karpenter.node_iam_role_name}
   subnetSelectorTerms:
     - tags:
@@ -27,6 +27,6 @@ spec:
         deleteOnTermination: true
         throughput: 125
   tags:
-    team: workloads
+    team: proxy
 EOF
 }
