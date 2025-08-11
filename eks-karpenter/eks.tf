@@ -1,7 +1,7 @@
 locals {
-  vpc_cidr    = "10.3.0.0/16"
-  vpc_name    = "vpc-karpenter-v2"
-  eks_name    = "karpenter-v2"
+  vpc_cidr    = "10.4.0.0/16"
+  vpc_name    = "vpc-karpenter-v3"
+  eks_name    = "karpenter-v3"
   eks_version = "1.33"
   coredns_version = "v1.11.4-eksbuild.10"
   kube_proxy_version = "v1.32.3-eksbuild.7"
