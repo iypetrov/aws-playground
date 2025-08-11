@@ -10,7 +10,7 @@ metadata:
   name: proxy
 spec:
   amiSelectorTerms:
-    - alias: al2023@v20250801
+    - alias: al2023@v20250807
   role: ${module.karpenter.node_iam_role_name}
   subnetSelectorTerms:
     - tags:
