@@ -4,6 +4,12 @@ provider "aws" {
   region     = var.aws_region
 }
 
+# We need this to access public ECR
+provider "aws" {
+  alias  = "ecr"
+  region = "us-east-1"
+}
+
 provider "kubectl" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)

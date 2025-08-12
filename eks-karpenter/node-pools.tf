@@ -15,9 +15,9 @@ spec:
         nodegroup: nginx
     spec:
       nodeClassRef:
-        name: proxy
         group: karpenter.k8s.aws
         kind: EC2NodeClass
+        name: proxy
       taints:
         - key: proxy-taint 
           value: nginx          

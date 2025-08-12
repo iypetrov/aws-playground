@@ -1,6 +1,6 @@
 locals {
-  vpc_cidr    = "10.4.0.0/16"
-  vpc_name    = "vpc-karpenter-v3"
+  vpc_cidr = "10.4.0.0/16"
+  vpc_name = "vpc-karpenter-v3"
 }
 
 module "vpc" {
@@ -43,7 +43,8 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb"         = 1
     "kubernetes.io/cluster/${local.eks_name}" = "owned"
-    "karpenter.sh/discovery"                  = "${local.eks_name}"
+    # Tags subnets for Karpenter auto-discovery
+    "karpenter.sh/discovery" = "${local.eks_name}"
   }
 
   tags = {

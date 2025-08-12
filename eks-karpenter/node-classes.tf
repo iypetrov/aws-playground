@@ -27,6 +27,6 @@ spec:
         deleteOnTermination: true
         throughput: 125
   tags:
-    team: proxy
+    karpenter.sh/discovery: ${local.eks_name}
 EOF
 }
