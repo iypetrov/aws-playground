@@ -20,3 +20,4 @@
 terraform.tfstate
 terraform.tfstate.backup
 eks-karpenter/terraform.tfvars
+eks-karpenter-with-fargate-profile/terraform.tfvars
