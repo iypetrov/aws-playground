@@ -3,10 +3,10 @@ locals {
   eks_version                    = "1.33"
   karpenter_namespace            = "karpenter"
   karpenter_version              = "1.0.6"
-  coredns_version                = "v1.11.4-eksbuild.10"
+  coredns_version                = "v1.12.2-eksbuild.1"
   eks_pod_identity_agent_version = "v1.3.7-eksbuild.2"
   kube_proxy_version             = "v1.32.3-eksbuild.7"
-  vpc_cni_version                = "v1.19.5-eksbuild.1"
+  vpc_cni_version                = "v1.20.1-eksbuild.1"
 }
 
 module "eks" {
@@ -25,18 +25,40 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   cluster_addons = {
-    # Enable after creation to run on Karpenter managed nodes
     coredns = {
-      version = local.coredns_version
+      addon_version = local.coredns_version
+      configuration_values = jsonencode({
+        computeType = "Fargate"
+        # Ensure that the we fully utilize the minimum amount of resources that are supplied by
+        # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
+        # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
+        # components (kubelet, kube-proxy, and containerd). Fargate rounds up to the following
+        # compute configuration that most closely matches the sum of vCPU and memory requests in
+        # order to ensure pods always have the resources that they need to run.
+        resources = {
+          limits = {
+            cpu = "0.25"
+            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+            # request/limit to ensure we can fit within that task
+            memory = "256M"
+          }
+          requests = {
+            cpu = "0.25"
+            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
+            # request/limit to ensure we can fit within that task
+            memory = "256M"
+          }
+        }
+      })
     }
     eks-pod-identity-agent = {
-      version = local.eks_pod_identity_agent_version
+      addon_version = local.eks_pod_identity_agent_version
     }
     kube-proxy = {
-      version = local.kube_proxy_version
+      addon_version = local.kube_proxy_version
     }
     vpc-cni = {
-      version = local.vpc_cni_version
+      addon_version = local.vpc_cni_version
     }
   }
 
@@ -49,6 +71,11 @@ module "eks" {
     karpenter = {
       selectors = [
         { namespace = local.karpenter_namespace }
+      ]
+    }
+    kube-system = {
+      selectors = [
+        { namespace = "kube-system" }
       ]
     }
   }
