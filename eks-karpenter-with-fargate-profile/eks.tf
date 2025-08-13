@@ -2,7 +2,7 @@ locals {
   eks_name                       = "karpenter-v4"
   eks_version                    = "1.33"
   karpenter_namespace            = "karpenter"
-  karpenter_version              = "1.0.6"
+  karpenter_version              = "1.6.0"
   coredns_version                = "v1.12.2-eksbuild.1"
   eks_pod_identity_agent_version = "v1.3.7-eksbuild.2"
   kube_proxy_version             = "v1.32.3-eksbuild.7"
@@ -97,8 +97,9 @@ module "karpenter" {
   enable_v1_permissions = true
   namespace             = local.karpenter_namespace
 
-  enable_irsa            = true
-  irsa_oidc_provider_arn = module.eks.oidc_provider_arn
+  enable_irsa             = true
+  create_instance_profile = true
+  irsa_oidc_provider_arn  = module.eks.oidc_provider_arn
 
   # EKS Fargate does not support pod identity
   create_pod_identity_association = false
@@ -106,6 +107,10 @@ module "karpenter" {
   # Name needs to match role name passed to the EC2NodeClass
   node_iam_role_use_name_prefix = false
   node_iam_role_name            = local.eks_name
+  # Attach additional IAM policies to the Karpenter node IAM role
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  }
 }
 
 data "aws_ecrpublic_authorization_token" "token" {
