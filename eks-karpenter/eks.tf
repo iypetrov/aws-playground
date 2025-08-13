@@ -1,8 +1,8 @@
 locals {
-  eks_name                       = "karpenter-v3"
+  eks_name                       = "karpenter-v9"
   eks_version                    = "1.33"
   karpenter_namespace            = "karpenter"
-  karpenter_version              = "1.0.6"
+  karpenter_version              = "1.6.1"
   coredns_version                = "v1.11.4-eksbuild.10"
   eks_pod_identity_agent_version = "v1.3.7-eksbuild.2"
   kube_proxy_version             = "v1.32.3-eksbuild.7"

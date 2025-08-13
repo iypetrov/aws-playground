@@ -42,6 +42,11 @@ spec:
         - key: karpenter.sh/capacity-type
           operator: In
           values: ["on-demand"]
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 1m
+    budgets:
+    - nodes: "1"
   limits:
     cpu: 200
     memory: 200Gi
@@ -92,6 +97,11 @@ spec:
         - key: karpenter.sh/capacity-type
           operator: In
           values: ["on-demand"]
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 1m
+    budgets:
+    - nodes: "1"
   limits:
     cpu: 200
     memory: 200Gi

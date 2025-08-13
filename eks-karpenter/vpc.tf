@@ -1,6 +1,6 @@
 locals {
-  vpc_cidr = "10.4.0.0/16"
-  vpc_name = "vpc-karpenter-v3"
+  vpc_cidr = "10.9.0.0/16"
+  vpc_name = "vpc-karpenter-v9"
 }
 
 module "vpc" {
