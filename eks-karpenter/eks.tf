@@ -26,7 +26,7 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      version = local.coredns_version
+      addon_version = local.coredns_version
       configuration_values = jsonencode({
         tolerations = [
           # Allow CoreDNS to run on the same nodes as the Karpenter controller
@@ -40,13 +40,13 @@ module "eks" {
       })
     }
     eks-pod-identity-agent = {
-      version = local.eks_pod_identity_agent_version
+      addon_version = local.eks_pod_identity_agent_version
     }
     kube-proxy = {
-      version = local.kube_proxy_version
+      addon_version = local.kube_proxy_version
     }
     vpc-cni = {
-      version = local.vpc_cni_version
+      addon_version = local.vpc_cni_version
     }
   }
 
