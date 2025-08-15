@@ -2,16 +2,16 @@ locals {
   eks_name                       = "karpenter-v4"
   eks_version                    = "1.33"
   karpenter_namespace            = "karpenter"
-  karpenter_version              = "1.6.0"
-  coredns_version                = "v1.12.2-eksbuild.1"
-  eks_pod_identity_agent_version = "v1.3.7-eksbuild.2"
-  kube_proxy_version             = "v1.32.3-eksbuild.7"
+  karpenter_version              = "1.6.1"
+  coredns_version                = "v1.12.2-eksbuild.4"
+  eks_pod_identity_agent_version = "v1.3.8-eksbuild.2"
+  kube_proxy_version             = "v1.33.3-eksbuild.4"
   vpc_cni_version                = "v1.20.1-eksbuild.1"
 }
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "20.37.2"
 
   cluster_name    = local.eks_name
   cluster_version = local.eks_version
@@ -28,7 +28,7 @@ module "eks" {
     coredns = {
       addon_version = local.coredns_version
       configuration_values = jsonencode({
-        computeType = "Fargate"
+        # computeType = "Fargate"
         # Ensure that the we fully utilize the minimum amount of resources that are supplied by
         # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
         # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
@@ -90,9 +90,11 @@ module "eks" {
 
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 20.0"
+  version = "20.37.2"
 
   cluster_name = module.eks.cluster_name
+
+  access_entry_type = "FARGATE_LINUX"
 
   enable_v1_permissions = true
   namespace             = local.karpenter_namespace

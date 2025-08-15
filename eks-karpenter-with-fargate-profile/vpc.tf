@@ -5,7 +5,7 @@ locals {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "5.21.0"
 
   name = local.vpc_name
   cidr = local.vpc_cidr
@@ -37,12 +37,12 @@ module "vpc" {
 
   public_subnet_tags = {
     "kubernetes.io/role/elb"                  = 1
-    "kubernetes.io/cluster/${local.eks_name}" = "owned"
+    "kubernetes.io/cluster/${local.eks_name}" = "shared"
   }
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb"         = 1
-    "kubernetes.io/cluster/${local.eks_name}" = "owned"
+    "kubernetes.io/cluster/${local.eks_name}" = "shared"
     # Tags subnets for Karpenter auto-discovery
     "karpenter.sh/discovery" = "${local.eks_name}"
   }
