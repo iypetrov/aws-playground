@@ -11,7 +11,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "20.30.1"
 
   cluster_name    = local.eks_name
   cluster_version = local.eks_version
@@ -89,7 +89,7 @@ module "eks" {
 
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 20.0"
+  version = "20.30.1"
 
   cluster_name = module.eks.cluster_name
 
