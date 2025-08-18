@@ -28,7 +28,7 @@ module "eks" {
     coredns = {
       addon_version = local.coredns_version
       configuration_values = jsonencode({
-        # computeType = "Fargate"
+        computeType = "Fargate"
         # Ensure that the we fully utilize the minimum amount of resources that are supplied by
         # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
         # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
@@ -94,8 +94,6 @@ module "karpenter" {
 
   cluster_name = module.eks.cluster_name
 
-  access_entry_type = "FARGATE_LINUX"
-
   enable_v1_permissions = true
   namespace             = local.karpenter_namespace
 
@@ -140,6 +138,11 @@ resource "helm_release" "karpenter" {
     serviceAccount:
       annotations:
         eks.amazonaws.com/role-arn: ${module.karpenter.iam_role_arn}
+    tolerations:
+      - key: "eks.amazonaws.com/compute-type"
+        operator: "Equal"
+        value: "fargate"
+        effect: "NoSchedule"
     webhook:
       enabled: false
     EOT
