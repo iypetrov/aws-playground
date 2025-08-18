@@ -126,7 +126,8 @@ resource "helm_release" "karpenter" {
   repository          = "oci://public.ecr.aws/karpenter"
   chart               = "karpenter"
   version             = local.karpenter_version
-  wait                = false
+  wait                = true
+  timeout             = 600
 
   values = [
     <<-EOT
@@ -143,8 +144,10 @@ resource "helm_release" "karpenter" {
         operator: "Equal"
         value: "fargate"
         effect: "NoSchedule"
+    nodeSelector:
+      eks.amazonaws.com/compute-type: fargate
     webhook:
-      enabled: false
+      enabled: true
     EOT
   ]
 
