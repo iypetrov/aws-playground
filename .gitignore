@@ -19,5 +19,6 @@
 .terraform.tfstate.lock.info
 terraform.tfstate
 terraform.tfstate.backup
+eks-auto-mode/terraform.tfvars
 eks-karpenter/terraform.tfvars
 eks-karpenter-with-fargate-profile/terraform.tfvars
