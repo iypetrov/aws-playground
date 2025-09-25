@@ -6,7 +6,7 @@ locals {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.21.0"
+  version = "6.2.0"
 
   name = local.name
   cidr = local.vpc_cidr
@@ -53,64 +53,24 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.37.2"
+  version = "21.3.1"
 
-  cluster_name    = local.name
-  cluster_version = local.k8s_version
+  name               = local.name
+  kubernetes_version = local.k8s_version
 
-  cluster_endpoint_public_access           = true
+  endpoint_public_access                   = true
   enable_cluster_creator_admin_permissions = true
+
+  create_auto_mode_iam_resources = true
+  compute_config = {
+    enabled    = true
+    node_pools = ["general-purpose"]
+  }
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-  cluster_compute_config = {
-    enabled    = true
-    node_pools = []
-  }
-
   tags = {
     Name = local.name
   }
-}
-
-resource "aws_iam_role" "custom_nodeclass_role" {
-  name = "${local.name}-AmazonEKSAutoNodeRole"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
-
-  tags = {
-    Name = local.name
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.custom_nodeclass_role.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.custom_nodeclass_role.name
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_pull_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.custom_nodeclass_role.name
-}
-
-output "custom_nodeclass_role_name" {
-  value = aws_iam_role.custom_nodeclass_role.name
 }
