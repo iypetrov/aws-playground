@@ -1,15 +1,31 @@
 ---
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: basic
+spec:
+  # module.eks.node_iam_role_arn
+  role: "eks-auto-v1-eks-auto-20250925102449654100000002"
+  subnetSelectorTerms:
+    - tags:
+        Name: "eks-auto-v1-private*"
+  securityGroupSelectorTerms:
+    - tags:
+        Name: "eks-auto-v1-node"
+  ephemeralStorage:
+    size: "80Gi"    
+    iops: 3000      
+    throughput: 125 
+---
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
-  name: basic
+  name: basic-node-pool
 spec:
   template:
     metadata:
       labels:
-        type: karpenter
-        provisioner: amd64
-        NodeGroupType: amd64
+        type: basic-node-pool
     spec:
       taints:
         - key: amd64
