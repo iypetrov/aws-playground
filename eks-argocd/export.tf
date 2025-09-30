@@ -1,8 +1,7 @@
-resource "gitsync_values_yaml" "example" {
+resource "gitsync_values_yaml" "argocd" {
   branch  = "master"
-  path    = "values/values.yaml"
+  path    = "gasx/argocd/values.yaml"
   content = <<EOT
 name: bar
-replicas: 2
 EOT
 }
