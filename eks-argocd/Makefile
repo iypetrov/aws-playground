@@ -7,3 +7,6 @@ add:
 	@argocd login localhost:8080 --username admin --password "$$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d)" --insecure
 	@argocd repo add https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git --username ilia.petrov --password some-token
 	# Go to the apps repo and manually apply the application manifest
+
+restart-argocd-server:
+	@kubectl rollout restart deployment argocd-server -n argocd 
