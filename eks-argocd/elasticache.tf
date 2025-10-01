@@ -9,7 +9,7 @@ module "elasticache" {
   version = "1.9.0"
 
   replication_group_id    = local.elasticache_name
-  replicas_per_node_group = 2
+  replicas_per_node_group = 0
 
   engine         = local.elasticache_engine
   engine_version = local.elasticache_engine_version
