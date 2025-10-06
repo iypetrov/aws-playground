@@ -3,7 +3,7 @@ resource "gitsync_values_yaml" "argocd" {
   path    = "gasx/argocd/values.yaml"
   content = <<EOT
 name: ${local.eks_argocd_name}
-nodeIamRoleArn: ${module.eks-argocd.node_iam_role_arn}
+nodeIamRoleName: ${module.eks-argocd.node_iam_role_name}
 EOT
 }
 
@@ -12,7 +12,7 @@ resource "gitsync_values_yaml" "elk" {
   path    = "gasx/elk/values.yaml"
   content = <<EOT
 name: ${local.eks_elk_name}
-nodeIamRoleArn: ${module.eks-elk.node_iam_role_arn}
+nodeIamRoleName: ${module.eks-elk.node_iam_role_name}
 EOT
 }
 
@@ -21,7 +21,7 @@ resource "gitsync_values_yaml" "internal-01" {
   path    = "gasx/internal-01/values.yaml"
   content = <<EOT
 name: ${local.eks_internal_01_name}
-nodeIamRoleArn: ${module.eks-internal-01.node_iam_role_arn}
+nodeIamRoleName: ${module.eks-internal-01.node_iam_role_name}
 hello-world:
   enabled: true
   replicaCount: 2
