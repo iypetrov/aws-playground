@@ -1,14 +1,14 @@
 locals {
-  eks_name    = "eks-argocd"
-  k8s_version = "1.33"
+  eks_argocd_name    = "eks-argocd"
+  k8s_argocd_version = "1.33"
 }
 
-module "eks" {
+module "eks-argocd" {
   source  = "terraform-aws-modules/eks/aws"
   version = "21.3.1"
 
-  name               = local.eks_name
-  kubernetes_version = local.k8s_version
+  name               = local.eks_argocd_name
+  kubernetes_version = local.k8s_argocd_version
 
   endpoint_public_access                   = true
   enable_cluster_creator_admin_permissions = true
@@ -23,6 +23,6 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   tags = {
-    Name = local.eks_name
+    Name = local.eks_argocd_name
   }
 }
