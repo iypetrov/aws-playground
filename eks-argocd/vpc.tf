@@ -28,12 +28,6 @@ module "vpc" {
     cidrsubnet(local.vpc_cidr, 8, 6)
   ]
 
-  elasticache_subnets = [
-    cidrsubnet(local.vpc_cidr, 8, 7),
-    cidrsubnet(local.vpc_cidr, 8, 8),
-    cidrsubnet(local.vpc_cidr, 8, 9)
-  ]
-
   enable_dns_hostnames = true
   enable_dns_support   = true
 

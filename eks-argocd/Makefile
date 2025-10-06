@@ -1,6 +1,8 @@
 bootstrap:
 	@kubectl create namespace argocd
-	@kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml -n argocd
+	@helm repo add argo https://argoproj.github.io/argo-helm
+	@helm repo update
+	@helm install argocd -n argocd --set server.extraArgs="{--insecure}" argo/argo-cd
 
 # kubectl port-forward svc/argocd-server -n argocd 8080:443
 add:
