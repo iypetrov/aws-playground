@@ -5,12 +5,12 @@ provider "aws" {
 }
 
 provider "gitsync" {
-  url   = "https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git"
-  token = var.gitlab_token
+  url   = "https://github.com/iypetrov/aws-playground.git"
+  token = var.github_token
 }
 
 provider "gitsync" {
   alias = "poc"
-  url   = "https://innersource.soprasteria.com/ENER-GX/Infrastructure/infratools/apps-poc.git"
-  token = var.gitlab_token
+  url   = "https://github.com/iypetrov/aws-playground.git"
+  token = var.github_token
 }

@@ -1,0 +1,54 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: internal-01-admin
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git
+    targetRevision: master
+    path: eks-argocd/apps/prod/internal-01
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://26D2E802B025D1680CE3E4157E9C3A63.gr7.eu-central-1.eks.amazonaws.com
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=false
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: internal-01
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://innersource.soprasteria.com/ENER-GX/Infrastructure/infratools/apps-poc.git
+    targetRevision: master
+    path: eks-argocd/apps-poc/prod/internal-01
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://26D2E802B025D1680CE3E4157E9C3A63.gr7.eu-central-1.eks.amazonaws.com
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=false
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

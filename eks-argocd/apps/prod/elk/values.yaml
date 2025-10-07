@@ -1,0 +1,4 @@
+name: eks-elk
+nodeIamRoleName: eks-elk-eks-auto-20251006113757533600000003
+eck-operator:
+  replicaCount: 3

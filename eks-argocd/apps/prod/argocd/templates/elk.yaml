@@ -1,0 +1,27 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elk
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git
+    targetRevision: master
+    path: eks-argocd/apps/prod/elk
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://2D12F504749A5D7DCAD4EFF69A76B7D4.gr7.eu-central-1.eks.amazonaws.com 
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=false
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

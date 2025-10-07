@@ -1,0 +1,5 @@
+name: eks-internal-01
+nodeIamRoleName: eks-internal-01-eks-auto-20251006113757536300000006
+hello-world:
+  enabled: true
+  replicaCount: 3

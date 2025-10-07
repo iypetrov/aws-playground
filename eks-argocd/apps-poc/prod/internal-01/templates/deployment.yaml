@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd
+  namespace: foo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: httpd
+  template:
+    metadata:
+      labels:
+        app: httpd
+    spec:
+      tolerations:
+        - key: amd64
+          operator: "Exists"
+      nodeSelector:
+        type: basic-node-pool
+      containers:
+        - name: httpd
+          image: httpd:2.4
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"

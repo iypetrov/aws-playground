@@ -13,7 +13,7 @@ variable "aws_region" {
   default = "eu-central-1"
 }
 
-variable "gitlab_token" {
+variable "github_token" {
   type      = string
   sensitive = true
 }

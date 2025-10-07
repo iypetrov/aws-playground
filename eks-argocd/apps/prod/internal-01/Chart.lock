@@ -1,0 +1,6 @@
+dependencies:
+- name: hello-world
+  repository: file://../../charts/hello-world
+  version: 0.1.0
+digest: sha256:d3f2bdeab3a23ea030b37f85947db61a8fd89e91ec7c007a30020a44fa76456f
+generated: "2025-10-06T17:04:02.550770214+03:00"

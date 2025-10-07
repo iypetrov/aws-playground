@@ -1,0 +1,17 @@
+---
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: basic-node-class
+spec:
+  role: "{{ .Values.nodeIamRoleName }}"
+  subnetSelectorTerms:
+    - tags:
+        Name: "{{ .Values.name }}-private*"
+  securityGroupSelectorTerms:
+    - tags:
+        Name: "{{ .Values.name }}-node"
+  ephemeralStorage:
+    size: "80Gi"    
+    iops: 3000      
+    throughput: 125 
