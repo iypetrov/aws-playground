@@ -4,6 +4,8 @@ resource "gitsync_values_yaml" "argocd" {
   content = <<EOT
 name: ${local.eks_argocd_name}
 nodeIamRoleName: ${module.eks-argocd.node_iam_role_name}
+internal01ServerEndpoint: ${module.eks-internal-01.cluster_endpoint}
+eksServerEndpoint: ${module.eks-elk.cluster_endpoint}
 EOT
 }
 

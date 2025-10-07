@@ -7,14 +7,14 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git
-    targetRevision: master
+    repoURL: https://github.com/iypetrov/aws-playground.git
+    targetRevision: main
     path: eks-argocd/apps/prod/elk
     helm:
       valueFiles:
         - values.yaml
   destination:
-    server: https://2D12F504749A5D7DCAD4EFF69A76B7D4.gr7.eu-central-1.eks.amazonaws.com 
+    server: {{ .Values.elkServerEndpoint }}
     namespace: kube-system
   syncPolicy:
     automated:

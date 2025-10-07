@@ -7,8 +7,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git
-    targetRevision: master
+    repoURL: https://github.com/iypetrov/aws-playground.git
+    targetRevision: main
     path: eks-argocd/apps/prod/argocd
     helm:
       valueFiles:

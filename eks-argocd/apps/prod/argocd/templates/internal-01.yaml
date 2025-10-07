@@ -7,14 +7,14 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git
-    targetRevision: master
+    repoURL: https://github.com/iypetrov/aws-playground.git
+    targetRevision: main
     path: eks-argocd/apps/prod/internal-01
     helm:
       valueFiles:
         - values.yaml
   destination:
-    server: https://26D2E802B025D1680CE3E4157E9C3A63.gr7.eu-central-1.eks.amazonaws.com
+    server: {{ .Values.internal01ServerEndpoint }}
     namespace: kube-system
   syncPolicy:
     automated:
@@ -34,14 +34,14 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://innersource.soprasteria.com/ENER-GX/Infrastructure/infratools/apps-poc.git
-    targetRevision: master
+    repoURL: https://github.com/iypetrov/aws-playground.git
+    targetRevision: main
     path: eks-argocd/apps-poc/prod/internal-01
     helm:
       valueFiles:
         - values.yaml
   destination:
-    server: https://26D2E802B025D1680CE3E4157E9C3A63.gr7.eu-central-1.eks.amazonaws.com
+    server: {{ .Values.internal01ServerEndpoint }}
     namespace: kube-system
   syncPolicy:
     automated:
