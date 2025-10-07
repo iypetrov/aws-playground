@@ -8,3 +8,9 @@ provider "gitsync" {
   url   = "https://innersource.soprasteria.com/ENER-GXrestricted/infrastructure/apps.git"
   token = var.gitlab_token
 }
+
+provider "gitsync" {
+  alias = "poc"
+  url   = "https://innersource.soprasteria.com/ENER-GX/Infrastructure/infratools/apps-poc.git"
+  token = var.gitlab_token
+}

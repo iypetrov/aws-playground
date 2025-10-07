@@ -134,12 +134,12 @@ module "vpc-internal-01" {
   one_nat_gateway_per_az = false
 
   public_subnet_tags = {
-    "Name"                   = "${local.vpc_internal_01_name}-public-subnet"
+    "Name"                   = "${local.eks_internal_01_name}-public-subnet"
     "kubernetes.io/role/elb" = 1
   }
 
   private_subnet_tags = {
-    "Name"                            = "${local.vpc_internal_01_name}-private-subnet"
+    "Name"                            = "${local.eks_internal_01_name}-private-subnet"
     "kubernetes.io/role/internal-elb" = 1
   }
 
