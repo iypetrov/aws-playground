@@ -22,6 +22,8 @@ import software.amazon.awssdk.services.secretsmanager.model.ResourceExistsExcept
 import software.amazon.awssdk.services.secretsmanager.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.secretsmanager.model.SecretsManagerException;
 import software.amazon.awssdk.services.secretsmanager.model.InvalidRequestException;
+import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretRequest;
+import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretResponse;
 
 @Service
 public class SecretService {
@@ -115,6 +117,21 @@ public class SecretService {
     }
 
     public DeleteSecretResponseModel deleteSecret(String secretName) {
+        try {
+            DescribeSecretResponse describe = secretsManagerClient.describeSecret(
+                    DescribeSecretRequest.builder().secretId(secretName).build()
+            );
+            if (describe.deletedDate() != null) {
+                String when = describe.deletedDate().toString();
+                throw new ApiException(HttpStatus.BAD_REQUEST,
+                        "Secret is already scheduled for deletion at: " + when);
+            }
+        } catch (ResourceNotFoundException e) {
+            throw new ApiException(HttpStatus.NOT_FOUND, humanMessage(e, "Secret not found: " + secretName), e);
+        } catch (SecretsManagerException e) {
+            logger.warn("DescribeSecret failed for {}. Proceeding to delete.", secretName, e);
+        }
+
         DeleteSecretRequest deleteSecretRequest = DeleteSecretRequest.builder()
                 .secretId(secretName)
                 .forceDeleteWithoutRecovery(true)
