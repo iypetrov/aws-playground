@@ -24,6 +24,9 @@ import software.amazon.awssdk.services.secretsmanager.model.SecretsManagerExcept
 import software.amazon.awssdk.services.secretsmanager.model.InvalidRequestException;
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretRequest;
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretResponse;
+import software.amazon.awssdk.services.secretsmanager.model.Tag;
+
+import java.util.List;
 
 @Service
 public class SecretService {
@@ -34,10 +37,15 @@ public class SecretService {
         this.secretsManagerClient = secretsManagerClient;
     }
 
-    public CreateSecretResponseModel createSecret(String secretName, String value) {
+    public CreateSecretResponseModel createSecret(String secretName, String value, String type) {
         CreateSecretRequest createSecretRequest = CreateSecretRequest.builder()
                 .name(secretName)
                 .secretString(value)
+                .description("Secret managed by ip812")
+                .tags(List.of(
+                        Tag.builder().key("ManagedBy").value("ip812").build(),
+                        Tag.builder().key("SecretType").value(type).build()
+                ))
                 .build();
 
         CreateSecretResponse createSecretResponse;

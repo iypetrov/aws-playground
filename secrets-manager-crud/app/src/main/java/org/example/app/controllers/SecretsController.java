@@ -38,7 +38,8 @@ public class SecretsController {
     ) {
         CreateSecretResponseModel secretResponseModel = secretService.createSecret(
                 createSecretRequestDTO.type() + "." + createSecretRequestDTO.name(),
-                createSecretRequestDTO.secret()
+                createSecretRequestDTO.secret(),
+                createSecretRequestDTO.type().getName()
         );
         return ResponseEntity.ok(
                 new CreateSecretResponseDTO(
