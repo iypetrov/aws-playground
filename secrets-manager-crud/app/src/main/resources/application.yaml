@@ -1,0 +1,7 @@
+spring:
+    application:
+        name: app
+aws:
+    accessKeyId: "foo"
+    secretAccessKey: "bar"
+    region: "eu-central-1"
