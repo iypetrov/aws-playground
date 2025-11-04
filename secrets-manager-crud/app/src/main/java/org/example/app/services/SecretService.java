@@ -1,5 +1,7 @@
 package org.example.app.services;
-
+import org.example.app.exceptions.ApiException;
+import org.springframework.http.HttpStatus;
+import org.example.app.enums.SecretType;
 import org.example.app.models.CreateSecretResponseModel;
 import org.example.app.models.GetSecretResponseModel;
 import org.example.app.models.UpdateSecretResponseModel;
@@ -16,6 +18,10 @@ import software.amazon.awssdk.services.secretsmanager.model.PutSecretValueReques
 import software.amazon.awssdk.services.secretsmanager.model.PutSecretValueResponse;
 import software.amazon.awssdk.services.secretsmanager.model.DeleteSecretRequest;
 import software.amazon.awssdk.services.secretsmanager.model.DeleteSecretResponse;
+import software.amazon.awssdk.services.secretsmanager.model.ResourceExistsException;
+import software.amazon.awssdk.services.secretsmanager.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.secretsmanager.model.SecretsManagerException;
+import software.amazon.awssdk.services.secretsmanager.model.InvalidRequestException;
 
 @Service
 public class SecretService {
@@ -33,12 +39,20 @@ public class SecretService {
                 .build();
 
         CreateSecretResponse createSecretResponse;
-
         try {
             createSecretResponse = secretsManagerClient.createSecret(createSecretRequest);
-        } catch (Exception e) {
-            logger.error("Error while creating the secret", e.getMessage());
-            throw e;
+        } catch (ResourceExistsException e) {
+            logger.error("Secret already exists: {}", secretName, e);
+            throw new ApiException(HttpStatus.CONFLICT, humanMessage(e, "Secret already exists: " + secretName), e);
+        } catch (InvalidRequestException e) {
+            logger.error("Invalid request creating secret {}", secretName, e);
+            throw new ApiException(HttpStatus.BAD_REQUEST, humanMessage(e, "Invalid request creating secret: " + secretName), e);
+        } catch (SecretsManagerException e) {
+            logger.error("AWS error creating secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, humanMessage(e, "AWS error creating secret: " + secretName), e);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error creating secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, defaultMessage(e, "Unexpected error creating secret: " + secretName), e);
         }
 
         logger.info("Creating secret {}", createSecretResponse.toString());
@@ -55,12 +69,17 @@ public class SecretService {
                 .build();
 
         GetSecretValueResponse getSecretValueResponse;
-
         try {
             getSecretValueResponse = secretsManagerClient.getSecretValue(getSecretValueRequest);
-        } catch (Exception e) {
-            logger.error("Error while creating the secret", e.getMessage());
-            throw e;
+        } catch (ResourceNotFoundException e) {
+            logger.error("Secret not found: {}", secretName, e);
+            throw new ApiException(HttpStatus.NOT_FOUND, humanMessage(e, "Secret not found: " + secretName), e);
+        } catch (SecretsManagerException e) {
+            logger.error("AWS error getting secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, humanMessage(e, "AWS error getting secret: " + secretName), e);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error getting secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, defaultMessage(e, "Unexpected error getting secret: " + secretName), e);
         }
 
         logger.info("Get secret {}", getSecretValueResponse.toString());
@@ -74,12 +93,17 @@ public class SecretService {
                 .build();
 
         PutSecretValueResponse putSecretValueResponse;
-
         try {
             putSecretValueResponse = secretsManagerClient.putSecretValue(putSecretValueRequest);
-        } catch (Exception e) {
-            logger.error("Error while updating the secret", e.getMessage());
-            throw e;
+        } catch (ResourceNotFoundException e) {
+            logger.error("Secret not found for update: {}", secretName, e);
+            throw new ApiException(HttpStatus.NOT_FOUND, humanMessage(e, "Secret not found: " + secretName), e);
+        } catch (SecretsManagerException e) {
+            logger.error("AWS error updating secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, humanMessage(e, "AWS error updating secret: " + secretName), e);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error updating secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, defaultMessage(e, "Unexpected error updating secret: " + secretName), e);
         }
 
         logger.info("Update secret {}", putSecretValueResponse.toString());
@@ -97,12 +121,17 @@ public class SecretService {
                 .build();
 
         DeleteSecretResponse deleteSecretResponse;
-
         try {
             deleteSecretResponse = secretsManagerClient.deleteSecret(deleteSecretRequest);
-        } catch (Exception e) {
-            logger.error("Error while deleting the secret", e.getMessage());
-            throw e;
+        } catch (ResourceNotFoundException e) {
+            logger.error("Secret not found for deletion: {}", secretName, e);
+            throw new ApiException(HttpStatus.NOT_FOUND, humanMessage(e, "Secret not found: " + secretName), e);
+        } catch (SecretsManagerException e) {
+            logger.error("AWS error deleting secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, humanMessage(e, "AWS error deleting secret: " + secretName), e);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error deleting secret {}", secretName, e);
+            throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, defaultMessage(e, "Unexpected error deleting secret: " + secretName), e);
         }
 
         logger.info("Delete secret {}", deleteSecretResponse.toString());
@@ -111,5 +140,21 @@ public class SecretService {
                 deleteSecretResponse.arn(),
                 deleteSecretResponse.deletionDate() != null ? deleteSecretResponse.deletionDate().toString() : null
         );
+    }
+
+    private String humanMessage(SecretsManagerException e, String fallback) {
+        try {
+            String msg = e.awsErrorDetails() != null ? e.awsErrorDetails().errorMessage() : null;
+            if (msg != null && !msg.isBlank()) {
+                return msg;
+            }
+        } catch (Exception ignored) { }
+        String msg = e.getMessage();
+        return (msg != null && !msg.isBlank()) ? msg : fallback;
+    }
+
+    private String defaultMessage(RuntimeException e, String fallback) {
+        String msg = e.getMessage();
+        return (msg != null && !msg.isBlank()) ? msg : fallback;
     }
 }

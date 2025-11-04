@@ -1,4 +1,6 @@
 package org.example.app.dtos;
 
-public record CreateSecretRequestDTO(String name, String secret) {
+import org.example.app.enums.SecretType;
+
+public record CreateSecretRequestDTO(String name, String secret, SecretType type) {
 }

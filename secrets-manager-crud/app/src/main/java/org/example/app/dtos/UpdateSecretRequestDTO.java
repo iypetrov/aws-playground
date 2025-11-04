@@ -1,6 +1,7 @@
 package org.example.app.dtos;
 
-public record UpdateSecretRequestDTO(String name, String secret) {
-}
+import org.example.app.enums.SecretType;
 
+public record UpdateSecretRequestDTO(String name, String secret, SecretType type) {
+}
 
