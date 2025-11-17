@@ -6,9 +6,9 @@ module "vpc" {
   cidr = local.vpc_cidr
 
   azs = [
-    "${var.aws_region}a",
-    "${var.aws_region}b",
-    "${var.aws_region}c"
+    "${local.aws_region}a",
+    "${local.aws_region}b",
+    "${local.aws_region}c"
   ]
 
   private_subnets = [
