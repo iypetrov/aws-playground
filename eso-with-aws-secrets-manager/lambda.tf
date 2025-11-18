@@ -45,7 +45,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 resource "aws_lambda_function" "lambda" {
   function_name = "secrets-manager-api"
   timeout       = 900
-  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.0.2"
+  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.3.0"
   package_type  = "Image"
   role          = aws_iam_role.lambda_role.arn
   environment {

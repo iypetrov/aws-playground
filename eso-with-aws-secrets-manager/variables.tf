@@ -1,9 +1,10 @@
 locals {
-  name        = "eks-secrets-example"
-  env         = "prod"
-  vpc_cidr    = "10.0.0.0/16"
-  k8s_version = "1.34"
-  aws_region = "eu-central-1"
+  name           = "eks-secrets-example"
+  env            = "prod"
+  vpc_cidr       = "10.0.0.0/16"
+  k8s_version    = "1.34"
+  aws_region     = "eu-central-1"
+  subdomain_name = "secrets"
 }
 
 variable "aws_access_key_id" {
@@ -14,4 +15,12 @@ variable "aws_access_key_id" {
 variable "aws_secret_access_key" {
   type      = string
   sensitive = true
+}
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
 }
