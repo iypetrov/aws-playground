@@ -1,7 +1,6 @@
 package org.example.app.services;
 import org.example.app.exceptions.ApiException;
 import org.springframework.http.HttpStatus;
-import org.example.app.enums.SecretType;
 import org.example.app.models.CreateSecretResponseModel;
 import org.example.app.models.GetSecretResponseModel;
 import org.example.app.models.UpdateSecretResponseModel;
@@ -25,11 +24,15 @@ import software.amazon.awssdk.services.secretsmanager.model.InvalidRequestExcept
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretRequest;
 import software.amazon.awssdk.services.secretsmanager.model.DescribeSecretResponse;
 import software.amazon.awssdk.services.secretsmanager.model.Tag;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 @Service
 public class SecretService {
+    @Value("${app.secretPrefix}")
+    private String appSecretPrefix;
+
     private static final Logger logger = LoggerFactory.getLogger(SecretService.class);
     private final SecretsManagerClient secretsManagerClient;
 
@@ -37,14 +40,14 @@ public class SecretService {
         this.secretsManagerClient = secretsManagerClient;
     }
 
-    public CreateSecretResponseModel createSecret(String secretName, String value, String type) {
+    public CreateSecretResponseModel createSecret(String secretName, String value) {
         CreateSecretRequest createSecretRequest = CreateSecretRequest.builder()
                 .name(secretName)
                 .secretString(value)
                 .description("Secret managed by ip812")
                 .tags(List.of(
                         Tag.builder().key("ManagedBy").value("ip812").build(),
-                        Tag.builder().key("SecretType").value(type).build()
+                        Tag.builder().key("SecretType").value(appSecretPrefix).build()
                 ))
                 .build();
 

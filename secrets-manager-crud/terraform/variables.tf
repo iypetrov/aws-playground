@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 variable "aws_access_key_id" {
   type      = string
   sensitive = true

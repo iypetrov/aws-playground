@@ -1,7 +1,10 @@
+app:
+  name: "app"
+  secretPrefix: "APP"
 spring:
-    application:
-        name: app
+  application:
+    name: app
 aws:
-    accessKeyId: "foo"
-    secretAccessKey: "bar"
-    region: "eu-central-1"
+  accessKeyId: "foo"
+  secretAccessKey: "bar"
+  region: "eu-central-1"

@@ -10,8 +10,8 @@ import org.example.app.models.CreateSecretResponseModel;
 import org.example.app.models.GetSecretResponseModel;
 import org.example.app.models.UpdateSecretResponseModel;
 import org.example.app.models.DeleteSecretResponseModel;
-import org.example.app.enums.SecretType;
 import org.example.app.services.SecretService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,17 +19,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/secrets")
 public class SecretsController {
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.secretPrefix}")
+    private String appSecretPrefix;
+
     private final SecretService secretService;
 
     public SecretsController(SecretService secretService) {
         this.secretService = secretService;
+    }
+
+    private String getSecretName(String secretName) {
+        return  appSecretPrefix + "." + appName + "." + secretName;
     }
 
     @PostMapping
@@ -37,9 +46,8 @@ public class SecretsController {
             @RequestBody CreateSecretRequestDTO createSecretRequestDTO
     ) {
         CreateSecretResponseModel secretResponseModel = secretService.createSecret(
-                createSecretRequestDTO.type() + "." + createSecretRequestDTO.name(),
-                createSecretRequestDTO.secret(),
-                createSecretRequestDTO.type().getName()
+                getSecretName(createSecretRequestDTO.name()),
+                createSecretRequestDTO.secret()
         );
         return ResponseEntity.ok(
                 new CreateSecretResponseDTO(
@@ -52,10 +60,9 @@ public class SecretsController {
 
     @GetMapping("/{name}")
     public ResponseEntity<GetSecretResponseDTO> getSecret(
-            @PathVariable String name,
-            @RequestParam SecretType type
+            @PathVariable String name
     ) {
-        GetSecretResponseModel secretResponseModel = secretService.getSecret(type + "." + name);
+        GetSecretResponseModel secretResponseModel = secretService.getSecret(getSecretName(name));
         return ResponseEntity.ok(
                 new GetSecretResponseDTO(secretResponseModel.getSecret())
         );
@@ -66,7 +73,7 @@ public class SecretsController {
             @RequestBody UpdateSecretRequestDTO updateSecretRequestDTO
     ) {
         UpdateSecretResponseModel updateSecretResponseModel = secretService.updateSecret(
-                updateSecretRequestDTO.type() + "." + updateSecretRequestDTO.name(),
+                getSecretName(updateSecretRequestDTO.name()),
                 updateSecretRequestDTO.secret()
         );
         return ResponseEntity.ok(
@@ -80,10 +87,9 @@ public class SecretsController {
 
     @DeleteMapping("/{name}")
     public ResponseEntity<DeleteSecretResponseDTO> deleteSecret(
-            @PathVariable String name,
-            @RequestParam SecretType type
+            @PathVariable String name
     ) {
-        DeleteSecretResponseModel deleteSecretResponseModel = secretService.deleteSecret(type + "." + name);
+        DeleteSecretResponseModel deleteSecretResponseModel = secretService.deleteSecret(getSecretName(name));
         return ResponseEntity.ok(
                 new DeleteSecretResponseDTO(
                         deleteSecretResponseModel.getName(),
