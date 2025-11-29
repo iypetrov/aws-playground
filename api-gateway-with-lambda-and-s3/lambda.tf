@@ -26,6 +26,13 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
           "ec2:DeleteNetworkInterface",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets",
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath",
+          "kms:Decrypt",
           "s3:GetObject"
         ]
         Resource = "*"
@@ -39,10 +46,28 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_security_group" "lambda_sg" {
+  name        = "lambda_sg"
+  description = "Allow all outbound traffic for Lambda"
+  vpc_id      = aws_vpc.vpc.id
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [local.vpc_cidr]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_lambda_function" "lambda" {
   function_name = "${local.name}"
   timeout       = 900
-  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.3.0"
+  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.5.0"
   package_type  = "Image"
   role          = aws_iam_role.lambda_role.arn
   vpc_config {
@@ -52,6 +77,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       APP_ENV = local.env
+      S3_BUCKET = "secrets-manager-api-static-content-bucket-prod"
     }
   }
 }

@@ -3,7 +3,7 @@ locals {
   env            = "prod"
   vpc_cidr       = "10.1.0.0/16"
   aws_region     = "eu-central-1"
-  subdomain_name = "secrets"
+  subdomain_name = "secretsapi"
 }
 
 variable "aws_access_key_id" {

@@ -25,6 +25,11 @@ resource "aws_api_gateway_integration" "proxy_integration" {
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {
+  depends_on = [
+    aws_api_gateway_method.any_method,
+    aws_api_gateway_integration.proxy_integration,
+  ]
+
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
@@ -32,4 +37,15 @@ resource "aws_api_gateway_stage" "api_stage" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   stage_name    = local.env
+}
+
+resource "aws_api_gateway_domain_name" "api_domain" {
+  domain_name     = "${local.subdomain_name}.${var.domain_name}"
+  certificate_arn = aws_acm_certificate.cert.arn
+}
+
+resource "aws_api_gateway_base_path_mapping" "mapping" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
 }
