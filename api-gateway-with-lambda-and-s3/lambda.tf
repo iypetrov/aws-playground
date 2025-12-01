@@ -78,7 +78,7 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       APP_ENV = local.env
-      S3_BUCKET = "secrets-manager-api-static-content-bucket-prod"
+      S3_BUCKET = aws_s3_bucket.bucket.id
     }
   }
 }
