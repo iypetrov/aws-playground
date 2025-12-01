@@ -33,7 +33,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
           "kms:Decrypt",
-          "s3:GetObject"
+          "s3:GetObject",
+          "eks:ListClusters"
         ]
         Resource = "*"
       }
