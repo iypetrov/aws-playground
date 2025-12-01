@@ -26,9 +26,16 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
           "ec2:DeleteNetworkInterface",
+          "secretsmanager:CreateSecret",
+          "secretsmanager:PutSecretValue",
           "secretsmanager:GetSecretValue",
+          "secretsmanager:UpdateSecret",
+          "secretsmanager:UpdateSecretVersionStage",
+          "secretsmanager:DeleteSecret",
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecrets",
+          "secretsmanager:TagResource",
+          "secretsmanager:UntagResource",
           "ssm:GetParameter",
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
@@ -68,7 +75,7 @@ resource "aws_security_group" "lambda_sg" {
 resource "aws_lambda_function" "lambda" {
   function_name = "${local.name}"
   timeout       = 900
-  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.5.0"
+  image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.6.1"
   package_type  = "Image"
   role          = aws_iam_role.lambda_role.arn
   vpc_config {
