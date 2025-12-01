@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name = "secrets-manager-api"
+  name = "secrets-manager-api-${local.env}"
 }
 
 resource "aws_api_gateway_resource" "proxy" {

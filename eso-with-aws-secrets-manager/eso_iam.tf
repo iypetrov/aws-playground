@@ -25,7 +25,7 @@ resource "aws_iam_policy" "eso" {
 module "eso_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts"
   version = "6.2.3"
-  name    = "${local.name}-eso"
+  name    = "${local.name}-eso-${local.env}"
 
   policies = {
     policy = aws_iam_policy.eso.arn

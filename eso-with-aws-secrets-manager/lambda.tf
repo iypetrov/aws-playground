@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_role" {
-  name = "secrets-manager-role"
+  name = "secrets-manager-role-${local.env}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -13,7 +13,7 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
-  name = "allow-secrets-manager-all"
+  name = "allow-secrets-manager-all-${local.env}"
   role = aws_iam_role.lambda_role.id
 
   policy = jsonencode({
@@ -43,7 +43,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 }
 
 resource "aws_lambda_function" "lambda" {
-  function_name = "secrets-manager-api"
+  function_name = "secrets-manager-api-${local.env}"
   timeout       = 900
   image_uri     = "833704146350.dkr.ecr.eu-central-1.amazonaws.com/secrets-manager-api:1.3.0"
   package_type  = "Image"

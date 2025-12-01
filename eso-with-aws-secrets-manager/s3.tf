@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket        = "secrets-manager-api-static-content-bucket"
+  bucket        = "secrets-manager-api-static-content-bucket-${local.env}"
   force_destroy = true
 }
 
