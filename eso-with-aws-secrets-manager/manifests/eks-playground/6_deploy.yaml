@@ -26,11 +26,16 @@ spec:
             - containerPort: 8080
               name: http
           env:
-            - name: alalbabalfoo
+            - name: random-cert-crt
               valueFrom:
                 secretKeyRef:
-                  name: playground-k8s-secrets
-                  key: RESTRICTED.playground.TLS_CERTIFICATE.some_very_random_cert
+                  name: some-very-random-cert
+                  key: tls.crt
+            - name: random-cert-key
+              valueFrom:
+                secretKeyRef:
+                  name: some-very-random-cert
+                  key: tls.key
 ---
 apiVersion: v1
 kind: Service
