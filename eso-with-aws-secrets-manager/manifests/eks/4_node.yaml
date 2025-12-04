@@ -5,7 +5,7 @@ metadata:
   name: basic
 spec:
   # module.eks.node_iam_role_name
-  role: "eks-secrets-example-eks-auto-20251117120622888400000001"
+  role: "eks-secrets-example-eks-auto-20251204122048121000000001"
   subnetSelectorTerms:
     - tags:
         Name: "eks-secrets-example-private*"

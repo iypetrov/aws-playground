@@ -1,3 +1,10 @@
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id      = module.vpc.vpc_id
+  service_name      = "com.amazonaws.${local.aws_region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = module.vpc.private_route_table_ids
+}
+
 resource "aws_s3_bucket" "bucket" {
   bucket        = "secrets-manager-api-static-content-bucket-${local.env}"
   force_destroy = true
@@ -31,11 +38,12 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      
       {
-        Sid    = "AllowCloudFrontAccess"
+        Sid    = "AllowLambdaAccess"
         Effect = "Allow"
         Principal = {
-          AWS = aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn
+          AWS = aws_iam_role.lambda_role.arn
         }
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.bucket.arn}/*"

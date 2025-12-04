@@ -1,4 +1,4 @@
-resource "aws_acm_certificate" "cloudfront" {
+resource "aws_acm_certificate" "cert" {
   provider          = aws.us_east_1
   domain_name       = "${local.subdomain_name}.${var.domain_name}"
   validation_method = "DNS"
@@ -8,10 +8,11 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-resource "aws_route53_record" "cloudfront_validation" {
-  provider = aws.us_east_1
+resource "aws_route53_record" "cert_validation" {
+  depends_on = [aws_acm_certificate.cert]
+
   for_each = {
-    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -19,27 +20,27 @@ resource "aws_route53_record" "cloudfront_validation" {
   }
 
   allow_overwrite = true
+  zone_id         = var.zone_id
   name            = each.value.name
+  type            = each.value.type
   records         = [each.value.record]
   ttl             = 60
-  type            = each.value.type
-  zone_id         = var.zone_id
 }
 
-resource "aws_acm_certificate_validation" "cloudfront" {
+resource "aws_acm_certificate_validation" "cert" {
   provider                = aws.us_east_1
-  certificate_arn         = aws_acm_certificate.cloudfront.arn
-  validation_record_fqdns = [for record in aws_route53_record.cloudfront_validation : record.fqdn]
+  certificate_arn         = aws_acm_certificate.cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
-resource "aws_route53_record" "cloudfront" {
+resource "aws_route53_record" "subdomain" {
+  zone_id = var.zone_id
   name    = local.subdomain_name
   type    = "A"
-  zone_id = var.zone_id
 
   alias {
-    name                   = aws_cloudfront_distribution.distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.distribution.hosted_zone_id
+    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
     evaluate_target_health = false
   }
 }

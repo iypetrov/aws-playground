@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app 
+  template:
+    metadata:
+      labels:
+        app: app 
+    spec:
+      tolerations:
+        - key: amd64
+          operator: "Exists"
+      nodeSelector:
+        type: basic-node-pool
+      containers:
+        - name: app 
+          image: iypetrov/debug-display-envs:1.1.0
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: foo
+              valueFrom:
+                secretKeyRef:
+                  name: app-k8s-secrets
+                  key: RESTRICTED.eks-secrets-example.STATIC_SECRET.demo_mon
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+  namespace: app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: app 
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: app
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 80
