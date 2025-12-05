@@ -56,9 +56,7 @@ resource "aws_iam_policy" "eso" {
       {
         Effect = "Allow"
         Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecrets",
+          "secretsmanager:*",
           "ssm:GetParameter",
           "ssm:GetParameters",
           "ssm:GetParametersByPath",
