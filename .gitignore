@@ -60,3 +60,4 @@ elasticache-valkey-replication-group/terraform.tfvars
 secrets-manager-crud/terraform/terraform.tfvars
 eso-with-aws-secrets-manager/terraform.tfvars
 api-gateway-with-lambda-and-s3/terraform.tfvars
+vault-mini/terraform.tfvars
