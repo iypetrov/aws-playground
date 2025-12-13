@@ -1,0 +1,176 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'S3 to SQS to Lambda integration for Slack notifications'
+Parameters:
+  LambdaImageUri:
+    Type: String
+    Description: 'ECR image URI for the Lambda function (e.g., account.dkr.ecr.region.amazonaws.com/repo:tag)'
+    Default: '833704146350.dkr.ecr.eu-central-1.amazonaws.com/queue-event-to-slack:1.2.2'
+  LambdaTimeout:
+    Type: Number
+    Description: 'Lambda function timeout in seconds'
+    Default: 900
+    MinValue: 1
+    MaxValue: 900
+  SQSVisibilityTimeout:
+    Type: Number
+    Description: 'SQS visibility timeout in seconds (should be 6x LambdaTimeout)'
+    Default: 5400
+    MinValue: 1
+  BucketName:
+    Type: String
+    Description: 'Name of the S3 bucket'
+    Default: 's3-to-slack-20251212'
+  QueueName:
+    Type: String
+    Description: 'Name of the SQS queue'
+    Default: 's3-to-slack-queue'
+  LambdaFunctionName:
+    Type: String
+    Description: 'Name of the Lambda function'
+    Default: 'queue-event-to-slack'
+  SlackChannelIdSecretName:
+    Type: String
+    Description: 'Name of the Secrets Manager secret for Slack channel ID'
+    Default: 'SLACK_CHANNEL_ID'
+  SlackBotTokenSecretName:
+    Type: String
+    Description: 'Name of the Secrets Manager secret for Slack bot token'
+    Default: 'SLACK_BOT_TOKEN'
+  Environment:
+    Type: String
+    Description: 'Environment name'
+    Default: 'prod'
+Resources:
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref QueueName
+      VisibilityTimeout: !Ref SQSVisibilityTimeout
+  SQSQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref SQSQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowS3ToSendMessages
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt SQSQueue.Arn
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:aws:s3:::${BucketName}
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DependsOn:
+      - SQSQueuePolicy
+    Properties:
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      VersioningConfiguration:
+        Status: Suspended
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Queue: !GetAtt SQSQueue.Arn
+          - Event: 's3:ObjectRemoved:*'
+            Queue: !GetAtt SQSQueue.Arn
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 
+        - '${LambdaFunctionName}-execution-role'
+        - LambdaFunctionName: !Ref LambdaFunctionName
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SQSAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:ReceiveMessage
+                  - sqs:DeleteMessage
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                Resource: !GetAtt SQSQueue.Arn
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      PackageType: Image
+      Code:
+        ImageUri: !Ref LambdaImageUri
+      Timeout: !Ref LambdaTimeout
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          APP_ENV: !Ref Environment
+          SLACK_CHANNEL_ID_ARN: !Sub 
+            - 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}'
+            - SecretName: !Ref SlackChannelIdSecretName
+          SLACK_BOT_TOKEN_ARN: !Sub 
+            - 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}'
+            - SecretName: !Ref SlackBotTokenSecretName
+  SQSToLambdaEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt SQSQueue.Arn
+      FunctionName: !Ref LambdaFunction
+      BatchSize: 10
+      Enabled: true
+Outputs:
+  S3BucketName:
+    Description: 'Name of the S3 bucket'
+    Value: !Ref S3Bucket
+    Export:
+      Name: !Sub '${AWS::StackName}-S3BucketName'
+  S3BucketArn:
+    Description: 'ARN of the S3 bucket'
+    Value: !Sub arn:aws:s3:::${BucketName}
+    Export:
+      Name: !Sub '${AWS::StackName}-S3BucketArn'
+  SQSQueueUrl:
+    Description: 'URL of the SQS queue'
+    Value: !Ref SQSQueue
+    Export:
+      Name: !Sub '${AWS::StackName}-SQSQueueUrl'
+  SQSQueueArn:
+    Description: 'ARN of the SQS queue'
+    Value: !GetAtt SQSQueue.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-SQSQueueArn'
+  LambdaFunctionName:
+    Description: 'Name of the Lambda function'
+    Value: !Ref LambdaFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionName'
+  LambdaFunctionArn:
+    Description: 'ARN of the Lambda function'
+    Value: !GetAtt LambdaFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionArn'
