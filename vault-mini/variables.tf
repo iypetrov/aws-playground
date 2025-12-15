@@ -1,3 +1,8 @@
+locals {
+  env            = "prod"
+  subdomain_name = "secrets"
+}
+
 variable "aws_access_key_id" {
   type      = string
   sensitive = true
@@ -12,3 +17,13 @@ variable "aws_region" {
   type    = string
   default = "eu-central-1"
 }
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}
+
+data "aws_caller_identity" "this" {}
