@@ -94,7 +94,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "ssm:GetParametersByPath",
           "kms:Decrypt",
           "s3:GetObject",
-          "eks:ListClusters"
+          "eks:ListClusters",
+          "dynamodb:Scan"
         ]
         Resource = "*"
       }
@@ -128,7 +129,7 @@ resource "aws_security_group" "lambda_sg" {
 resource "aws_lambda_function" "lambda" {
   function_name = "secrets-manager-api"
   timeout       = 900
-  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/secrets-manager-api:1.7.0"
+  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/secrets-manager-api:1.9.2"
   package_type  = "Image"
   role          = aws_iam_role.lambda_role.arn
   vpc_config {
