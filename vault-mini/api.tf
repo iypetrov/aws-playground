@@ -129,7 +129,7 @@ resource "aws_security_group" "lambda_sg" {
 resource "aws_lambda_function" "lambda" {
   function_name = "secrets-manager-api"
   timeout       = 900
-  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/secrets-manager-api:1.9.2"
+  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/secrets-manager-api:1.11.1"
   package_type  = "Image"
   role          = aws_iam_role.lambda_role.arn
   vpc_config {
