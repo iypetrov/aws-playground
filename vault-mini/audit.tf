@@ -46,7 +46,12 @@ resource "aws_iam_role_policy" "lambda_audit_policy" {
         Effect = "Allow",
         Action = [
           "secretsmanager:DescribeSecret",
-          "dynamodb:PutItem"
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:TagResource",
+          "acm:ImportCertificate",
+          "acm:DeleteCertificate",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
         ]
         Resource = "*"
       }
@@ -62,7 +67,7 @@ resource "aws_iam_role_policy_attachment" "lambda_audit_logging" {
 resource "aws_lambda_function" "lambda_audit" {
   function_name = "auto-acm-import-from-secrets-manager"
   timeout       = 900
-  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/auto-acm-import-from-secrets-manager:1.6.0"
+  image_uri     = "${data.aws_caller_identity.this.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/auto-acm-import-from-secrets-manager:1.15.0"
   package_type  = "Image"
   role          = aws_iam_role.lambda_audit_role.arn
   environment {
