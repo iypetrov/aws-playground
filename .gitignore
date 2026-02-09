@@ -62,3 +62,4 @@ eso-with-aws-secrets-manager/terraform.tfvars
 api-gateway-with-lambda-and-s3/terraform.tfvars
 vault-mini/terraform.tfvars
 s3-to-slack-tf/terraform.tfvars
+kubernetes-the-hard-way/terraform.tfvars
