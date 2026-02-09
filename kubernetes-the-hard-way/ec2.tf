@@ -1,22 +1,53 @@
 locals {
   nodes = [
     {
+      name          = "jumpbox"
+      description   = "Administration host"
+      ami           = "ami-00ebb2b898eebe380" # Debian Linux 13
+      instance_type = "t3.micro"
+      storage_size  = 10
+      user_data    = <<-EOF
+        #!/bin/bash
+        apt-get update
+        apt-get -y install wget curl vim openssl git
+        git clone --depth 1 https://github.com/kelseyhightower/kubernetes-the-hard-way.git /kubernetes-the-hard-way
+      EOF
+    },
+    {
       name          = "server"
+      description   = "Kubernetes server"
       ami           = "ami-00ebb2b898eebe380" # Debian Linux 13
       instance_type = "t3.small"
       storage_size  = 20
+      user_data    = <<-EOF
+        #!/bin/bash
+        apt-get update
+        apt-get -y install wget curl vim openssl git
+      EOF
     },
     {
       name          = "node-0"
+      description   = "Kubernetes worker node"
       ami           = "ami-00ebb2b898eebe380" # Debian Linux 13
       instance_type = "t3.small"
       storage_size  = 20
+      user_data    = <<-EOF
+        #!/bin/bash
+        apt-get update
+        apt-get -y install wget curl vim openssl git
+      EOF
     },
     {
       name          = "node-1"
+      description   = "Kubernetes worker node"
       ami           = "ami-00ebb2b898eebe380" # Debian Linux 13
       instance_type = "t3.small"
       storage_size  = 20
+      user_data    = <<-EOF
+        #!/bin/bash
+        apt-get update
+        apt-get -y install wget curl vim openssl git
+      EOF
     }
   ]
 }
@@ -70,11 +101,7 @@ resource "aws_instance" "this" {
   vpc_security_group_ids      = [aws_security_group.this.id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data_replace_on_change = true
-  user_data                   = <<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get -y install wget curl vim openssl git
-  EOF
+  user_data                   = each.value.user_data
 
   root_block_device {
     iops        = 3000
@@ -84,6 +111,7 @@ resource "aws_instance" "this" {
 
   tags = {
     Name = each.value.name
+    Description = each.value.description
   }
 
   lifecycle {
