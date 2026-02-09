@@ -10,6 +10,10 @@ locals {
         #!/bin/bash
         apt-get update
         apt-get -y install wget curl vim openssl git
+
+        curl -fsSL https://tailscale.com/install.sh | sh
+        tailscale up --authkey ${var.tailscale_auth_key} --hostname jumpbox --ssh
+
         git clone --depth 1 https://github.com/kelseyhightower/kubernetes-the-hard-way.git /kubernetes-the-hard-way
       EOF
     },
@@ -23,6 +27,9 @@ locals {
         #!/bin/bash
         apt-get update
         apt-get -y install wget curl vim openssl git
+
+        curl -fsSL https://tailscale.com/install.sh | sh
+        tailscale up --authkey ${var.tailscale_auth_key} --hostname server --ssh
       EOF
     },
     {
@@ -35,6 +42,9 @@ locals {
         #!/bin/bash
         apt-get update
         apt-get -y install wget curl vim openssl git
+
+        curl -fsSL https://tailscale.com/install.sh | sh
+        tailscale up --authkey ${var.tailscale_auth_key} --hostname node-0 --ssh
       EOF
     },
     {
@@ -47,6 +57,9 @@ locals {
         #!/bin/bash
         apt-get update
         apt-get -y install wget curl vim openssl git
+
+        curl -fsSL https://tailscale.com/install.sh | sh
+        tailscale up --authkey ${var.tailscale_auth_key} --hostname node-1 --ssh
       EOF
     }
   ]

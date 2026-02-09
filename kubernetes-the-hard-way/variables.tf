@@ -12,3 +12,8 @@ variable "aws_region" {
   type    = string
   default = "eu-central-1"
 }
+
+variable "tailscale_auth_key" {
+  type = string
+  sensitive = true  
+}
