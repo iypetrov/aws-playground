@@ -25,8 +25,6 @@ locals {
       storage_size  = 20
       user_data    = <<-EOF
         #!/bin/bash
-        apt-get update
-        apt-get -y install wget curl vim openssl git
 
         curl -fsSL https://tailscale.com/install.sh | sh
         tailscale up --authkey ${var.tailscale_auth_key} --hostname server --ssh
@@ -40,8 +38,6 @@ locals {
       storage_size  = 20
       user_data    = <<-EOF
         #!/bin/bash
-        apt-get update
-        apt-get -y install wget curl vim openssl git
 
         curl -fsSL https://tailscale.com/install.sh | sh
         tailscale up --authkey ${var.tailscale_auth_key} --hostname node-0 --ssh
@@ -55,8 +51,6 @@ locals {
       storage_size  = 20
       user_data    = <<-EOF
         #!/bin/bash
-        apt-get update
-        apt-get -y install wget curl vim openssl git
 
         curl -fsSL https://tailscale.com/install.sh | sh
         tailscale up --authkey ${var.tailscale_auth_key} --hostname node-1 --ssh
