@@ -57,6 +57,7 @@ locals {
       storage_size  = 20
       user_data    = <<-EOF
         #!/bin/bash
+
         apt-get update
         apt-get -y install curl
 
