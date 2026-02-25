@@ -48,4 +48,4 @@ helm install ztunnel istio/ztunnel \
 
 - https://rutube.ru/video/7359d8f145390372581d30fba91a48aa
 
-- https://aws.amazon.com/blogs/containers/migrating-from-aws-app-mesh-to-amazon-ecs-service-connect/
+- https://aws.amazon.com/blogs/containers/migrating-from-aws-app-mesh-to-amazon-vpc-lattice
