@@ -3,6 +3,9 @@
 ### Bootstrap
 
 ```bash
+kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+
 helm repo add istio https://istio-release.storage.googleapis.com/charts
 helm repo update
 
@@ -28,6 +31,11 @@ helm install ztunnel istio/ztunnel \
   -n istio-system \
   --wait \
   --version 1.29.0
+
+helm install istio-ingress istio/gateway \
+  -n istio-ingress \
+  --wait \
+  --version 1.29.0
 ```
 
 ### Demo Setup
@@ -49,3 +57,5 @@ helm install ztunnel istio/ztunnel \
 - https://rutube.ru/video/7359d8f145390372581d30fba91a48aa
 
 - https://aws.amazon.com/blogs/containers/migrating-from-aws-app-mesh-to-amazon-vpc-lattice
+
+- https://oneuptime.com/blog/post/2026-02-24-how-to-use-aws-acm-certificates-with-istio/view
