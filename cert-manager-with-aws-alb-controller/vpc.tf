@@ -1,5 +1,5 @@
 locals {
-  vpc_name = "cert-manager-with-aws-alb-controller"
+  vpc_name = "cert-manager-aws-alb-ctrl"
   vpc_cidr = "10.0.0.0/16"
 }
 

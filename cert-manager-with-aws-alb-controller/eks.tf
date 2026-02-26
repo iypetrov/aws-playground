@@ -1,5 +1,5 @@
 locals {
-  k8s_name    = "cert-manager-with-aws-alb-controller"
+  k8s_name    = "cert-manager-aws-alb-ctrl"
   k8s_version = "1.35"
 
   k8s_addons = {
