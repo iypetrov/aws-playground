@@ -3,7 +3,10 @@ locals {
   k8s_version = "1.35"
 
   k8s_addons = {
-    metrics_server = "v0.8.1-eksbuild.1"
+    metrics_server           = "v0.8.1-eksbuild.1"
+    cert_manager             = "v1.19.3-eksbuild.2"
+    kube_state_metrics       = "v2.18.0-eksbuild.1"
+    prometheus_node_exporter = "v1.10.2-eksbuild.8"
   }
 }
 
@@ -29,6 +32,15 @@ module "eks" {
   addons = {
     metrics-server = {
       addon_version = local.k8s_addons.metrics_server
+    }
+    cert-manager = {
+      addon_version = local.k8s_addons.cert_manager
+    }
+    kube-state-metrics = {
+      addon_version = local.k8s_addons.kube_state_metrics
+    }
+    prometheus-node-exporter = {
+      addon_version = local.k8s_addons.prometheus_node_exporter
     }
   }
 
