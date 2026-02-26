@@ -64,3 +64,4 @@ vault-mini/terraform.tfvars
 s3-to-slack-tf/terraform.tfvars
 kubernetes-the-hard-way/terraform.tfvars
 istio-poc/terraform.tfvars
+cert-manager-with-aws-alb-controller/terraform.tfvars
