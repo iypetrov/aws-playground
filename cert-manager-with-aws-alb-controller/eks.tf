@@ -36,3 +36,21 @@ module "eks" {
     Name = local.k8s_name
   }
 }
+
+module "cert_manager_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "2.7.0"
+
+  name = "cert-manager"
+
+  attach_cert_manager_policy    = true
+  cert_manager_hosted_zone_arns = [data.aws_route53_zone.this.arn]
+
+  associations = {
+    this = {
+      cluster_name    = local.k8s_name
+      namespace       = "cert-manager"
+      service_account = "cert-manager"
+    }
+  }
+}

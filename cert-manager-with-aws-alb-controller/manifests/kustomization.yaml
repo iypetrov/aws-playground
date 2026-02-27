@@ -1,0 +1,5 @@
+resources:
+- cluster_issuer.yaml
+- certificates.yaml
+- app.yaml
+- ingress.yaml
