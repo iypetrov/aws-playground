@@ -14,5 +14,5 @@ spec:
     app: app
   ports:
     - port: 443
-      targetPort: 80
+      targetPort: 443
       protocol: TCP
