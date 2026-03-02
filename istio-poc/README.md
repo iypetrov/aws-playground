@@ -40,52 +40,17 @@ helm install istio-ingress istio/gateway \
   --version 1.29.0
 ```
 
-### Demo Setup
+### Overview
 
-```bash
-# 1. Apply manifests (cert-manager Certificate, nginx Deployment/Service, Istio Gateway, Waypoint)
-kubectl apply -k manifests/
+This PoC runs Istio in **ambient mode** on EKS, demonstrating end-to-end encrypted traffic from the public internet all the way to backend pods — with no sidecars required.
 
-# 2. Enroll the default namespace in ambient mode
-kubectl label namespace default istio.io/dataplane-mode=ambient
+External traffic enters through an AWS **Network Load Balancer** (NLB), which forwards HTTPS connections to the Istio ingress gateway. TLS certificates are provisioned and rotated automatically by **cert-manager**, using Let's Encrypt via a DNS-01 challenge against Route 53. The ingress gateway terminates TLS and applies path-based routing rules to dispatch requests to the appropriate backend service.
 
-# 3. Point the app service at the waypoint so L7 policies are enforced
-kubectl label namespace default istio.io/use-waypoint=waypoint
-
-# 4. Verify waypoint is running
-kubectl get gateway waypoint -n default
-kubectl get pods -n default -l gateway.istio.io/managed=istio.io-mesh-controller
-
-# 5. Confirm ambient enrollment (pods show 1/1, not 2/2)
-kubectl get pods -n default
-istioctl ztunnel-config workload -n default
-
-# 6. Test routing (replace with your NLB hostname or DNS record)
-curl -v https://app.cpx-lab52.de/nginx
-```
-
-
-don't forget to reapply terraform, route53
-then run k rollout restart -n cert-manager deployment/cert-manager
-
-### Traffic Flow
+Inside the cluster, traffic stays encrypted thanks to Istio's **ambient data plane**. Rather than injecting a sidecar into every pod, ambient mode uses a per-node `ztunnel` to transparently handle mTLS between workloads at Layer 4. For Layer 7 concerns — traffic policies, header manipulation, fine-grained routing — a **waypoint proxy** is deployed per namespace and all mesh traffic for that namespace passes through it. This gives full L7 observability and control without the overhead of sidecar injection.
 
 ```
-Internet (HTTPS:443)
-  │
-  ▼
-AWS NLB  ← provisioned by AWS LB Controller via istio-ingress Service annotations
-  │  raw TCP passthrough
-  ▼
-Istio IngressGateway (istio-ingress ns, port 443)
-  │  terminates TLS — cert from cert-manager (app-cpx-lab52-de-tls)
-  │  VirtualService: /nginx → rewrite / → app.default.svc.cluster.local:80
-  │  mTLS via ztunnel (HBONE port 15008)
-  ▼
-Waypoint proxy (default ns)
-  │  L7: AuthorizationPolicy, retries, metrics per service
-  ▼
-nginx pod (app Deployment, port 80)
+Internet → NLB → Istio Ingress Gateway (TLS termination, path-based routing)
+         → ztunnel (mTLS) → Waypoint (L7 policy) → backend pods
 ```
 
 ### References
