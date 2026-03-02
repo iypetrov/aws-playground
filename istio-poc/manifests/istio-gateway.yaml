@@ -31,31 +31,31 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /nginx
+            prefix: /red
       rewrite:
         uri: /
       route:
         - destination:
-            host: nginx.poc.svc.cluster.local
+            host: red.poc.svc.cluster.local
             port:
               number: 80
     - match:
         - uri:
-            prefix: /headers
+            prefix: /green
       rewrite:
         uri: /
       route:
         - destination:
-            host: debug-display-req-headers.poc.svc.cluster.local
+            host: green.poc.svc.cluster.local
             port:
               number: 80
     - match:
         - uri:
-            prefix: /envs
+            prefix: /blue
       rewrite:
         uri: /
       route:
         - destination:
-            host: debug-display-envs.poc.svc.cluster.local
+            host: blue.poc.svc.cluster.local
             port:
               number: 80
