@@ -1,5 +1,8 @@
 resources:
 - clusterissuers.yaml
 - certificates.yaml
+- namespace.yaml
 - deployments.yaml
 - services.yaml
+- istiogateway.yaml
+- waypoint.yaml

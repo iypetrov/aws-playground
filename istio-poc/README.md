@@ -34,28 +34,64 @@ helm install ztunnel istio/ztunnel \
 
 helm install istio-ingress istio/gateway \
   -n istio-ingress \
+  --create-namespace \
+  -f values/ingress-values.yaml \
   --wait \
   --version 1.29.0
 ```
 
 ### Demo Setup
 
+```bash
+# 1. Apply manifests (cert-manager Certificate, nginx Deployment/Service, Istio Gateway, Waypoint)
+kubectl apply -k manifests/
+
+# 2. Enroll the default namespace in ambient mode
+kubectl label namespace default istio.io/dataplane-mode=ambient
+
+# 3. Point the app service at the waypoint so L7 policies are enforced
+kubectl label namespace default istio.io/use-waypoint=waypoint
+
+# 4. Verify waypoint is running
+kubectl get gateway waypoint -n default
+kubectl get pods -n default -l gateway.istio.io/managed=istio.io-mesh-controller
+
+# 5. Confirm ambient enrollment (pods show 1/1, not 2/2)
+kubectl get pods -n default
+istioctl ztunnel-config workload -n default
+
+# 6. Test routing (replace with your NLB hostname or DNS record)
+curl -v https://app.cpx-lab52.de/nginx
+```
+
+
+don't forget to reapply terraform, route53
+then run k rollout restart -n cert-manager deployment/cert-manager
+
+### Traffic Flow
+
+```
+Internet (HTTPS:443)
+  │
+  ▼
+AWS NLB  ← provisioned by AWS LB Controller via istio-ingress Service annotations
+  │  raw TCP passthrough
+  ▼
+Istio IngressGateway (istio-ingress ns, port 443)
+  │  terminates TLS — cert from cert-manager (app-cpx-lab52-de-tls)
+  │  VirtualService: /nginx → rewrite / → app.default.svc.cluster.local:80
+  │  mTLS via ztunnel (HBONE port 15008)
+  ▼
+Waypoint proxy (default ns)
+  │  L7: AuthorizationPolicy, retries, metrics per service
+  ▼
+nginx pod (app Deployment, port 80)
+```
+
 ### References
 
-- https://istio.io/latest/docs/ambient/install/helm/
+- https://istio.io/latest/docs/ambient/architecture/
 
-- https://istio.io/latest/docs/ops/integrations/loadbalancers/
+- https://oneuptime.com/blog/post/2026-02-24-how-to-configure-istio-with-aws-nlb/view
 
-- https://aws.amazon.com/blogs/containers/secure-end-to-end-traffic-on-amazon-eks-using-tls-certificate-in-acm-alb-and-istio/
-
-- https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/4045
-
-- https://aws.amazon.com/blogs/opensource/achieving-zero-trust-security-on-amazon-eks-with-istio/#:~:text=allowed%20(by%20default)-,Ingress%20Gateway%20Certificate%20Management,as%20certificate%20management%20and%20renewal.
-
-- https://github.com/aws-samples/eks-alb-istio-with-tls
-
-- https://rutube.ru/video/7359d8f145390372581d30fba91a48aa
-
-- https://aws.amazon.com/blogs/containers/migrating-from-aws-app-mesh-to-amazon-vpc-lattice
-
-- https://oneuptime.com/blog/post/2026-02-24-how-to-use-aws-acm-certificates-with-istio/view
+- https://istio.io/latest/docs/ambient/usage/waypoint/
