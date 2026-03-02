@@ -9,10 +9,10 @@ spec:
     istio: ingress
   servers:
     - hosts:
-        - "app.cpx-lab52.de"
+        - "app.ip812.click"
       tls:
         mode: SIMPLE
-        credentialName: app-cpx-lab52-de-tls
+        credentialName: app-ip812-click-tls
       port:
         number: 443
         name: https
@@ -25,7 +25,7 @@ metadata:
   namespace: poc
 spec:
   hosts:
-    - "app.cpx-lab52.de"
+    - "app.ip812.click"
   gateways:
     - istio-ingress/app-gateway
   http:

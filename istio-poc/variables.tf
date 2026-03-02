@@ -20,5 +20,5 @@ variable "zone_id" {
 
 variable "domain_name" {
   type    = string
-  default = "cpx-lab52.de"
+  default = "ip812.click"
 }

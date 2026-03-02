@@ -2,15 +2,15 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: app-cpx-lab52-de
+  name: app-ip812-click
   namespace: istio-ingress
 spec:
-  secretName: app-cpx-lab52-de-tls
+  secretName: app-ip812-click-tls
   duration: 2160h # 90d
   renewBefore: 360h # 15d
   subject:
     organizations:
-      - cpx-lab52-de
+      - ip812-click
   isCA: false
   privateKey:
     algorithm: RSA
@@ -21,7 +21,7 @@ spec:
     - server auth
     - client auth
   dnsNames:
-    - app.cpx-lab52.de 
+    - app.ip812.click
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
