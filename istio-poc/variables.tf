@@ -12,3 +12,13 @@ variable "aws_region" {
   type    = string
   default = "eu-central-1"
 }
+
+variable "zone_id" {
+  type      = string
+  sensitive = true
+}
+
+variable "domain_name" {
+  type    = string
+  default = "cpx-lab52.de"
+}
