@@ -49,8 +49,7 @@ External traffic enters through an AWS **Network Load Balancer** (NLB), which fo
 Inside the cluster, traffic stays encrypted thanks to Istio's **ambient data plane**. Rather than injecting a sidecar into every pod, ambient mode uses a per-node `ztunnel` to transparently handle mTLS between workloads at Layer 4. For Layer 7 concerns — traffic policies, header manipulation, fine-grained routing — a **waypoint proxy** is deployed per namespace and all mesh traffic for that namespace passes through it. This gives full L7 observability and control without the overhead of sidecar injection.
 
 ```
-Internet → NLB → Istio Ingress Gateway (TLS termination, path-based routing)
-         → ztunnel (mTLS) → Waypoint (L7 policy) → backend pods
+Internet → NLB → Istio Ingress Gateway (TLS termination, path-based routing) → ztunnel (mTLS) → Waypoint (L7 policy) → backend pods
 ```
 
 ### References
